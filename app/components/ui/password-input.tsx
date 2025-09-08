@@ -44,7 +44,7 @@ export default function PasswordInput({
           className="absolute cursor-pointer  right-[16px] top-[50%] translate-y-[-50%]"
           aria-label={showPassword ? "Hide password" : "Show password"}
         >
-          {showPassword ? <EyeIcon /> : <EyeSlashIcon />}
+          {!showPassword ? <EyeIcon /> : <EyeSlashIcon />}
         </button>
       </div>
     </div>
