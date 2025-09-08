@@ -107,7 +107,7 @@ export default function Landing() {
             </h2>
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
               Comprehensive practice system with 150+ questions, timed exams, subject-specific training, 
-              and detailed progress tracking. Prepare efficiently for your Australian Medical Council examinations.
+              and detailed progress tracking. Prepare efficiently for your Medical Council examinations.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
@@ -129,7 +129,7 @@ export default function Landing() {
           </div>
           <div className="hidden lg:block">
             <img 
-              src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&h=600" 
+              src="/landing/medical.jpg" 
               alt="Medical students studying" 
               className="rounded-xl shadow-2xl w-full h-auto"
             />
@@ -199,6 +199,7 @@ export default function Landing() {
           />
         </DialogContent>
       </Dialog> */}
+
     </div>
   );
 }
