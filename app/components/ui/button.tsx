@@ -1,63 +1,55 @@
-import { Slot } from "@radix-ui/react-slot";
-import { cva, type VariantProps } from "class-variance-authority";
-import { CircularProgressIcon } from "../svgs";
-import { cn } from "~/utils";
-import type { ButtonHTMLAttributes, ReactNode } from "react";
+import * as React from "react"
+import { Slot } from "@radix-ui/react-slot"
+import { cva, type VariantProps } from "class-variance-authority"
+import { cn } from "~/utils"
 
-export const buttonVariants = cva(
-    "grid place-items-center whitespace-nowrap rounded-[8px] text-[14px] lg:text-[16px] focus-visible:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-80",
-    {
-        variants: {
-            variant: {
-                default: "bg-primary text-white",
-                secondary:
-                    "bg-white border-[1px] text-primary",
-                outline:
-                    "bg-white border-[1px] text-primary",
-            },
-            size: {
-                default: "h-[42px] lg:h-[48px] px-[16px] lg:px-[24px] rounded-[8px]",
-                small: "h-[37px] px-[24px] rounded-[5px] text-[14px]",
-                lg: "h-[36px] py-[9.5px] px-[18px] lg:text-[14px] leading-[100%] tracking-[0%] text-white rounded-[8px]",
-                smallest: "h-[33px] px-[14px] rounded-[8px] text-[14px] lg:text-[14px]",
-                medium: "h-[40px] px-[24px] rounded-[5px] text-[14px]",
-                icon: "px-[14px] h-[40px] text-[14px] rounded-[8px] gap-[3px]"
-            },
-        },
-        defaultVariants: {
-            variant: "default",
-            size: "default",
-        },
+const buttonVariants = cva(
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        destructive:
+          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
+        outline:
+          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+        secondary:
+          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        ghost: "hover:bg-accent hover:text-accent-foreground",
+        link: "text-primary underline-offset-4 hover:underline",
+      },
+      size: {
+        default: "h-10 px-4 py-2",
+        sm: "h-9 rounded-md px-3",
+        lg: "h-11 rounded-md px-8",
+        icon: "h-10 w-10",
+      },
     },
-);
+    defaultVariants: {
+      variant: "default",
+      size: "default",
+    },
+  }
+)
 
-export interface ButtonProperties
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
+export interface ButtonProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement>,
     VariantProps<typeof buttonVariants> {
-  asChild?: boolean;
-  isLoading?: boolean;
-  leading?: ReactNode;
-  trailing?: ReactNode;
-  iconGap?: number;
+  asChild?: boolean
 }
 
-const Button = ({ className, variant, size, asChild = false, children, isLoading, disabled, leading, trailing, iconGap, ...properties }: ButtonProperties) => {
-    const Element = asChild ? Slot : "button";
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : "button"
     return (
-        <Element
-            className={cn(buttonVariants({ variant, size, className }))}
-            disabled={isLoading || disabled}
-            {...properties}
-        >
-            {isLoading ? (
-                <CircularProgressIcon />
-            ) : (
-                children
-            )}
-        </Element>
-    );
-}
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Button.displayName = "Button"
 
-Button.displayName = "Button";
-
-export { Button };
+export { Button, buttonVariants }
