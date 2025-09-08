@@ -1,3 +1,4 @@
+import { GraduationCap } from "lucide-react";
 import { Link } from "react-router";
 import { Button } from "~/components/ui/button";
 import PasswordInput from "~/components/ui/password-input";
@@ -8,13 +9,10 @@ export default function Login() {
         <main className="min-h-screen bg-whitesmoke grid place-items-center py-10">
             <div className="w-full max-w-[526px]">
                 <header className="grid place-items-center mb-[32px]">
-                    <h1 className="text-[32px] font-secondary font-bold">
-                        <span className="text-[#EA4335]">A</span>
-                        <span className="text-[#FBBC05]">.</span>
-                        <span className="text-primary">M</span>
-                        <span className="text-[#FBBC05]">.</span>
-                        <span className="text-[#34A853]">C</span>
-                    </h1>
+                    <Link to="/" className="flex items-center">
+                        <GraduationCap className="text-primary text-2xl mr-3" />
+                        <h1 className="text-xl font-bold text-foreground">AMC</h1>
+                    </Link>
                 </header>
                 <div className="bg-white rounded-[12px] p-[32px] md:p-[40px]">
                     <div className="mb-[40px] text-center">

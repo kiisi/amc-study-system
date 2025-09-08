@@ -1,14 +1,4 @@
-import { useState } from "react";
-// import { useAuth } from "@/hooks/use-auth";
-import { Redirect } from "wouter";
-// import {
-//   Dialog,
-//   DialogContent,
-//   DialogHeader,
-//   DialogTitle,
-// } from "@/components/ui/dialog";
-// import { LoginForm } from "@/components/auth/login-form";
-// import { RegisterForm } from "@/components/auth/register-form";
+// import { Redirect } from "wouter";
 import { 
   GraduationCap, 
   Brain, 
@@ -20,11 +10,12 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
+import { useNavigate } from "react-router";
 
 export default function Landing() {
-//   const { isAuthenticated } = useAuth();
-//   const [showLoginModal, setShowLoginModal] = useState(false);
-//   const [showRegisterModal, setShowRegisterModal] = useState(false);
+
+  const navigate = useNavigate()
+  // const { isAuthenticated } = useAuth();
 
 //   if (isAuthenticated) {
 //     return <Redirect to="/dashboard" />;
@@ -82,13 +73,13 @@ export default function Landing() {
             <div className="flex items-center space-x-4">
               <Button 
                 variant="ghost" 
-                // onClick={() => setShowLoginModal(true)}
+                onClick={() => navigate('/login')}
                 data-testid="button-login-header"
               >
                 Login
               </Button>
               <Button 
-                // onClick={() => setShowRegisterModal(true)}
+                onClick={() => navigate('/register')}
                 data-testid="button-signup-header"
               >
                 Sign Up
@@ -112,7 +103,7 @@ export default function Landing() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
                 size="lg" 
-                // onClick={() => setShowRegisterModal(true)}
+                onClick={() => navigate('/login')}
                 data-testid="button-start-practicing"
               >
                 Start Practicing Free
@@ -167,38 +158,6 @@ export default function Landing() {
           </div>
         </div>
       </section>
-
-      {/* Login Modal */}
-      {/* <Dialog open={showLoginModal} onOpenChange={setShowLoginModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="sr-only">Login</DialogTitle>
-          </DialogHeader>
-          <LoginForm
-            onSuccess={() => setShowLoginModal(false)}
-            onSwitchToRegister={() => {
-              setShowLoginModal(false);
-              setShowRegisterModal(true);
-            }}
-          />
-        </DialogContent>
-      </Dialog> */}
-
-      {/* Register Modal */}
-      {/* <Dialog open={showRegisterModal} onOpenChange={setShowRegisterModal}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="sr-only">Register</DialogTitle>
-          </DialogHeader>
-          <RegisterForm
-            onSuccess={() => setShowRegisterModal(false)}
-            onSwitchToLogin={() => {
-              setShowRegisterModal(false);
-              setShowLoginModal(true);
-            }}
-          />
-        </DialogContent>
-      </Dialog> */}
 
     </div>
   );
