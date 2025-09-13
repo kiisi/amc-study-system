@@ -19,9 +19,6 @@ export default function Login() {
 
     let fetcher = useFetcher()
 
-    console.log(fetcher.state)
-    console.log(fetcher.data)
-
     const actionData = fetcher.data
 
     return (

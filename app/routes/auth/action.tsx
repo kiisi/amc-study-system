@@ -6,6 +6,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { userToken } from "~/cookies.server";
 
+// Login
 export async function loginAccount(formData: FormData, request: Request) {
 
     let email = formData.get("email") as string;
@@ -25,16 +26,6 @@ export async function loginAccount(formData: FormData, request: Request) {
             message: "Not a valid password"
         }
     }
-
-    if (password?.length < 4) {
-        return {
-            status: "error",
-            message: "Password length must be a minimum of 4 characters"
-        }
-    }
-
-
-    //   let project = await fakeDb.updateProject({ title });
 
     try {
         const conn = await dbConnect();
@@ -77,6 +68,95 @@ export async function loginAccount(formData: FormData, request: Request) {
         return {
             success: true,
             message: 'Login successful.',
+        }
+    }
+    catch (error) {
+        console.log(error)
+        return {
+            status: "error",
+            message: 'An unknown error occured',
+        }
+    }
+}
+
+// Register
+
+export async function registerAccount(formData: FormData, request: Request) {
+
+    let firstName = formData.get("firstName") as string;
+    let lastName = formData.get("lastName") as string;
+    let email = formData.get("email") as string;
+    let password = formData.get("password") as string;
+
+    if (!firstName) {
+        return {
+            status: "error",
+            message: "First name is blank"
+        }
+    }
+
+    if (!lastName) {
+        return {
+            status: "error",
+            message: "Last name is blank"
+        }
+    }
+
+    if (!validator.isEmail(email)) {
+        return {
+            status: "error",
+            message: "Not a valid email"
+        }
+    }
+
+    if (!password) {
+        return {
+            status: "error",
+            message: "Not a valid password"
+        }
+    }
+
+    if (password?.length < 4) {
+        return {
+            status: "error",
+            message: "Password length must be a minimum of 4 characters"
+        }
+    }
+
+    try {
+        await dbConnect();
+    }
+    catch (error) {
+        console.log(error)
+        return {
+            status: "error",
+            message: 'An error occured while connecting to the server',
+        }
+    }
+
+    try {
+
+        const isExistingUser = await UserModel.findOne({ email })
+
+        if (isExistingUser) {
+            return {
+                status: "error",
+                message: 'An account with this email already exists.',
+            }
+        }
+
+        const hashedPassword = await bcrypt.hash(password!, 12);
+
+        await UserModel.create({
+            firstName,
+            lastName,
+            email,
+            password: hashedPassword,
+        });
+
+        return {
+            status: "success",
+            message: 'Account created successfully.',
         }
     }
     catch (error) {
