@@ -25,7 +25,7 @@ const { getSession, commitSession, destroySession } =
         path: "/",
         sameSite: "lax",
         secure: process.env.NODE_ENV === "production",
-        secrets: ["dev-secret-kiisiblinks"],
+        secrets: [process.env.SESSION_SECRET_KEY!],
       },
     },
   );
