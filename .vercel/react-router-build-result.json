@@ -1,0 +1,159 @@
+{
+  "buildManifest": {
+    "serverBundles": {
+      "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0": {
+        "id": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+        "file": "build/server/nodejs_eyJydW50aW1lIjoibm9kZWpzIn0/index.js",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    },
+    "routeIdToServerBundleId": {
+      "routes/landing": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/auth/login": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/auth/register": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0",
+      "routes/dashboard/index": "nodejs_eyJydW50aW1lIjoibm9kZWpzIn0"
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "app/root.tsx",
+        "path": "",
+        "config": {}
+      },
+      "routes/landing": {
+        "id": "routes/landing",
+        "parentId": "root",
+        "file": "app/routes/landing.tsx",
+        "index": true,
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/auth/login": {
+        "id": "routes/auth/login",
+        "parentId": "root",
+        "file": "app/routes/auth/login.tsx",
+        "path": "/login",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "routes/auth/register": {
+        "id": "routes/auth/register",
+        "parentId": "root",
+        "file": "app/routes/auth/register.tsx",
+        "path": "/register",
+        "config": {
+          "runtime": "nodejs"
+        }
+      },
+      "layouts/dashboard-layout": {
+        "id": "layouts/dashboard-layout",
+        "parentId": "root",
+        "file": "app/layouts/dashboard-layout.tsx",
+        "config": {}
+      },
+      "routes/dashboard/index": {
+        "id": "routes/dashboard/index",
+        "parentId": "layouts/dashboard-layout",
+        "file": "app/routes/dashboard/index.tsx",
+        "path": "dashboard",
+        "config": {
+          "runtime": "nodejs"
+        }
+      }
+    }
+  },
+  "reactRouterConfig": {
+    "appDirectory": "C:/Users/Kiisifelix/amc-study-system/app",
+    "basename": "/",
+    "buildDirectory": "C:/Users/Kiisifelix/amc-study-system/build",
+    "future": {
+      "v8_middleware": true,
+      "unstable_optimizeDeps": false,
+      "unstable_splitRouteModules": false,
+      "unstable_subResourceIntegrity": false,
+      "unstable_viteEnvironmentApi": false
+    },
+    "routes": {
+      "root": {
+        "id": "root",
+        "file": "root.tsx",
+        "path": ""
+      },
+      "routes/landing": {
+        "id": "routes/landing",
+        "parentId": "root",
+        "file": "routes/landing.tsx",
+        "index": true
+      },
+      "routes/auth/login": {
+        "id": "routes/auth/login",
+        "parentId": "root",
+        "file": "./routes/auth/login.tsx",
+        "path": "/login"
+      },
+      "routes/auth/register": {
+        "id": "routes/auth/register",
+        "parentId": "root",
+        "file": "./routes/auth/register.tsx",
+        "path": "/register"
+      },
+      "layouts/dashboard-layout": {
+        "id": "layouts/dashboard-layout",
+        "parentId": "root",
+        "file": "./layouts/dashboard-layout.tsx"
+      },
+      "routes/dashboard/index": {
+        "id": "routes/dashboard/index",
+        "parentId": "layouts/dashboard-layout",
+        "file": "./routes/dashboard/index.tsx",
+        "path": "dashboard"
+      }
+    },
+    "routeDiscovery": {
+      "mode": "lazy",
+      "manifestPath": "/__manifest"
+    },
+    "serverBuildFile": "index.js",
+    "serverModuleFormat": "esm",
+    "ssr": true,
+    "unstable_routeConfig": [
+      {
+        "id": "root",
+        "path": "",
+        "file": "root.tsx",
+        "children": [
+          {
+            "file": "routes/landing.tsx",
+            "index": true
+          },
+          {
+            "file": "./routes/auth/login.tsx",
+            "path": "/login"
+          },
+          {
+            "file": "./routes/auth/register.tsx",
+            "path": "/register"
+          },
+          {
+            "file": "./layouts/dashboard-layout.tsx",
+            "children": [
+              {
+                "file": "./routes/dashboard/index.tsx",
+                "path": "dashboard"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "viteConfig": {
+    "build": {
+      "assetsDir": "assets"
+    }
+  }
+}
