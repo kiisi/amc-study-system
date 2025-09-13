@@ -1,17 +1,17 @@
 
-import dbConnect from "~/lib/db";
+import dbConnect from "~/.server/db";
 import validator from 'validator';
 import { UserModel } from "~/lib/models/user";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { userToken } from "~/cookies.server";
+import { redirect } from "react-router";
+import { commitSession, getSession } from "~/.server/sessions";
 
 // Login
 export async function loginAccount(formData: FormData, request: Request) {
 
     let email = formData.get("email") as string;
     let password = formData.get("password") as string;
-    console.log(formData)
 
     if (!validator.isEmail(email)) {
         return {
@@ -29,7 +29,6 @@ export async function loginAccount(formData: FormData, request: Request) {
 
     try {
         const conn = await dbConnect();
-        console.log(conn)
     }
     catch (error) {
         console.log(error)
@@ -60,15 +59,17 @@ export async function loginAccount(formData: FormData, request: Request) {
 
         const token = jwt.sign({ _id: isExistingUser._id }, process.env.SECRET_KEY!, { expiresIn: "7d" });
 
-        const cookieHeader = request.headers.get("Cookie");
-        const cookie = (await userToken.parse(cookieHeader)) || {};
-        cookie.showBanner = false;
+        const session = await getSession(
+            request.headers.get("Cookie"),
+        );
 
+        session.set("token", token);
 
-        return {
-            success: true,
-            message: 'Login successful.',
-        }
+        return redirect("/dashboard", {
+            headers: {
+                "Set-Cookie": await commitSession(session),
+            },
+        });
     }
     catch (error) {
         console.log(error)
