@@ -1,4 +1,4 @@
-import { redirect, type AppLoadContext } from "react-router";
+import { redirect } from "react-router";
 import { destroySession, getSession } from "~/.server/sessions";
 import type { Route } from "../+types/root";
 
@@ -11,7 +11,7 @@ export function Layout({
 }
 
 async function authMiddleware(
-    { request, context }: { request: Request; context: AppLoadContext },
+    { request }: { request: Request },
     next: () => Promise<Response>,
 ): Promise<Response> {
 
