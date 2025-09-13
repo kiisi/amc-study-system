@@ -1,4 +1,4 @@
-import React, { useId, type InputHTMLAttributes } from "react";
+import { useId, type InputHTMLAttributes } from "react";
 import { cn } from "~/utils";
 
 export interface TextInputProps

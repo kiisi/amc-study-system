@@ -73,3 +73,22 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
     </main>
   );
 }
+
+async function loggingMiddleware(
+  { request, context },
+  next,
+) {
+  console.log(
+    `${new Date().toISOString()} ${request.method} ${request.url}`,
+  );
+  const start = performance.now();
+  const response = await next();
+  const duration = performance.now() - start;
+  console.log(
+    `${new Date().toISOString()} Response ${response.status} (${duration}ms)`,
+  );
+  console.log("Running... the server")
+  return response;
+}
+
+export const middleware = [loggingMiddleware];
