@@ -1,30 +1,27 @@
 import {
-  Link,
+  isRouteErrorResponse,
   Links,
   Meta,
   Outlet,
   Scripts,
   ScrollRestoration,
+  type AppLoadContext,
 } from "react-router";
+
 import type { Route } from "./+types/root";
+import "./app.css";
 import { rootContext } from "./contexts";
 
-export const middleware: Route.MiddlewareFunction[] = [
-  async ({ context }, next) => {
-    console.log("start root middleware");
-    context.set(rootContext, "ROOT");
-    let res = await next();
-    console.log("end root middleware");
-    return res;
+export const links: Route.LinksFunction = () => [
+  { rel: "preconnect", href: "https://fonts.googleapis.com" },
+  {
+    rel: "preconnect",
+    href: "https://fonts.gstatic.com",
+    crossOrigin: "anonymous",
   },
-];
-
-export const clientMiddleware: Route.ClientMiddlewareFunction[] = [
-  async ({ context }, next) => {
-    console.log("start root middleware");
-    context.set(rootContext, "ROOT");
-    await next();
-    console.log("end root middleware");
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
 
@@ -38,36 +35,6 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        <h1>Middleware playground</h1>
-        <nav>
-          <ul>
-            <li>
-              <Link to="/">Go to /</Link>
-            </li>
-            <li>
-              Server middleware routes:
-              <ul>
-                <li>
-                  <Link to="/server/a">Go to /server/a</Link>
-                </li>
-                <li>
-                  <Link to="/server/a/b">Go to /server/a/b</Link>
-                </li>
-              </ul>
-            </li>
-            <li>
-              Client middleware routes:
-              <ul>
-                <li>
-                  <Link to="/client/a">Go to /client/a</Link>
-                </li>
-                <li>
-                  <Link to="/client/a/b">Go to /client/a/b</Link>
-                </li>
-              </ul>
-            </li>
-          </ul>
-        </nav>
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -76,6 +43,45 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
-export default function App({ loaderData }: Route.ComponentProps) {
+export default function App() {
   return <Outlet />;
 }
+
+export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
+  let message = "Oops!";
+  let details = "An unexpected error occurred.";
+  let stack: string | undefined;
+
+  if (isRouteErrorResponse(error)) {
+    message = error.status === 404 ? "404" : "Error";
+    details =
+      error.status === 404
+        ? "The requested page could not be found."
+        : error.statusText || details;
+  } else if (import.meta.env.DEV && error && error instanceof Error) {
+    details = error.message;
+    stack = error.stack;
+  }
+
+  return (
+    <main className="pt-16 p-4 container mx-auto">
+      <h1>{message}</h1>
+      <p>{details}</p>
+      {stack && (
+        <pre className="w-full p-4 overflow-x-auto">
+          <code>{stack}</code>
+        </pre>
+      )}
+    </main>
+  );
+}
+
+export const middleware: Route.MiddlewareFunction[] = [
+  async ({ context }, next) => {
+    console.log("start root middleware");
+    context.set(rootContext, "ROOT");
+    let res = await next();
+    console.log("end root middleware");
+    return res;
+  },
+];
