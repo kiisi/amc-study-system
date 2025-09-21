@@ -44,7 +44,15 @@ export default function AdminPanel({
     const [selectedImages, setSelectedImages] = useState<File[]>([]);
     const [correctAnswer, setCorrectAnswer] = useState<string>("");
 
-    const [options, setOptions] = useState<{ [key: string]: string }>({});
+    const [options, setOptions] = useState<{ [key: string]: string }>({
+        A: '',
+        B: '',
+        C: '',
+        D: '',
+        E: '',
+    });
+
+    console.log(options)
 
     const fetcher = useFetcher()
 
@@ -313,6 +321,7 @@ export default function AdminPanel({
                                                         data-testid={`${letter}`}
                                                         name={`${letter}`}
                                                         className="w-full"
+                                                        value={options[letter]}
                                                         onChange={(e) =>
                                                             setOptions((prev) => ({ ...prev, [letter]: e.target.value }))
                                                         }
