@@ -1,11 +1,11 @@
 
-import dbConnect from "~/.server/db";
 import validator from 'validator';
-import { UserModel } from "~/lib/models/user";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { redirect } from "react-router";
-import { commitSession, getSession } from "~/.server/sessions";
+import dbConnect from '../../.server/db';
+import { UserModel } from '../../lib/models/user';
+import { commitSession, getSession } from '../../.server/sessions';
 
 // Login
 export async function loginAccount(formData: FormData, request: Request) {

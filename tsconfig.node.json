@@ -4,8 +4,13 @@
     "**/*.ts",
     "**/*.tsx",
     "dev-server.ts",
+     "**/.server/**/*.ts",
+    "**/.server/**/*.tsx",
+    "**/.client/**/*.ts",
+    "**/.client/**/*.tsx",
+    "./.react-router/types/**/*",
     "tailwind.config.ts",
-    "vite.config.ts"
+    "vite.config.ts",
   ],
   "compilerOptions": {
     "composite": true,

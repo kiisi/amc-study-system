@@ -76,12 +76,3 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   );
 }
 
-export const middleware: Route.MiddlewareFunction[] = [
-  async ({ context }, next) => {
-    console.log("start root middleware");
-    context.set(rootContext, "ROOT");
-    let res = await next();
-    console.log("end root middleware");
-    return res;
-  },
-];

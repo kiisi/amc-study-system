@@ -14,7 +14,7 @@ async function authMiddleware(
     { request }: { request: Request },
     next: () => Promise<Response>,
 ): Promise<Response> {
-    console.log("START<-----Dashnoard middleware----->START")
+    console.log("START<-----Dashboard middleware----->START")
 
     const session = await getSession(
         request.headers.get("Cookie"),
@@ -30,7 +30,7 @@ async function authMiddleware(
         });
     }
 
-    console.log("END<-----Dashnoard middleware----->END")
+    console.log("END<-----Dashboard middleware----->END")
 
     return next();
 }

@@ -1,5 +1,5 @@
 import { useId, type InputHTMLAttributes } from "react";
-import { cn } from "~/utils";
+import { cn } from "../../utils";
 
 export interface TextInputProps
   extends InputHTMLAttributes<HTMLInputElement> {

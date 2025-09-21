@@ -1,10 +1,9 @@
 import { CheckCircle2, CircleAlert, GraduationCap } from "lucide-react";
-import { Form, Link, useActionData, useFetcher } from "react-router";
-import { Button } from "~/components/ui/button";
-import PasswordInput from "~/components/ui/password-input";
-import TextInput from "~/components/ui/text-input";
-import type { Route } from "./+types/login";
+import { Link, useFetcher } from "react-router";
 import { loginAccount } from "./action";
+import { Button } from "../../components/ui/button";
+import TextInput from "../../components/ui/text-input";
+import PasswordInput from "../../components/ui/password-input";
 
 export async function action({
     request,
