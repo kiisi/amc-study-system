@@ -87,7 +87,7 @@ export default function Login() {
                                 type="submit"
                                 className="w-full"
                             >
-                                Create account
+                                Login
                             </Button>
                         </div>
                         <div className="text-center text-[14px] lg:text-[16px]">Don't have an account? <span className="text-primary hover:underline"><Link to="/register">Register</Link></span></div>
