@@ -65,6 +65,11 @@
   --shadow-2xl: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
+
+  /* New CSS Config */
+
+  --success: #1cca5b;
+  --error: #ef4343;
 }
 
 .dark {
@@ -117,6 +122,9 @@
 @theme {
   --color-primary: #0D72ED;
   --color-red: #ff3939;
+
+  --color-success: var(--success);
+  --color-error: var(--error);
 
   --font-primary: Inter, sans-serif;
   --font-secondary: "Instrument Sans", sans-serif;

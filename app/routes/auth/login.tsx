@@ -10,6 +10,8 @@ export async function action({
 }: Route.ActionArgs) {
     let formData = await request.formData();
 
+    console.log(formData.get("mode"))
+
     return await loginAccount(formData, request)
 }
 
