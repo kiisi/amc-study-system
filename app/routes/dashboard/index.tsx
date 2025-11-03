@@ -180,7 +180,7 @@ export default function Dashboard() {
                   <span>Adaptive question selection</span>
                 </div>
               </div>
-              <Link to="/practice">
+              <Link to="/practice-mode-start">
                 <Button className="w-full" data-testid="button-start-practice">
                   Start Practice Session
                 </Button>
