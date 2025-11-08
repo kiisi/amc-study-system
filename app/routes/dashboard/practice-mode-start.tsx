@@ -2,6 +2,8 @@ import { ArrowLeft, ArrowRight } from "lucide-react";
 import { useFetcher, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import { createQuizSession } from "./action";
+import { useEffect } from "react";
+import { error } from "~/components/ui/toast";
 
 export async function action({
     request,
@@ -20,9 +22,21 @@ export default function PracticeModeStart() {
 
     let fetcher = useFetcher();
 
+
     const handleExit = () => {
         navigate('/dashboard')
     }
+
+    // useEffect(() => {
+    //     console.log(fetcher)
+    //     if(fetcher?.data?.status === "error"){
+    //         error(fetcher.data.message);
+    //     }
+    // }, [fetcher?.data?.status])
+
+    // if(fetcher?.data?.status === "error"){
+    //         error(fetcher.data.message);
+    // }
 
     return (
         <div className="min-h-screen bg-background grid place-items-center">

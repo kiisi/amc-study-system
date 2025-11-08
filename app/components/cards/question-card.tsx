@@ -59,6 +59,8 @@ export default function QuestionCard({
   console.log("isCorrect", isCorrect)
   console.log("isWrong", isWrong)
 
+  const correctOptionAlphabet = options?.findIndex(item => item.option === correctAnswer); 
+
   useEffect(() => {
     setSelectedAnswer(null)
     setShowFeedback(false)
@@ -167,7 +169,7 @@ export default function QuestionCard({
 
           {showFeedback && explanation && (
             <Card className="bg-muted/50" data-testid="card-explanation">
-              <CardContent className="p-6 space-y-2">
+              <CardContent className="p-4 md:p-6 space-y-2">
                 <h4 className="font-semibold text-lg flex items-center gap-2">
                   {isCorrect ? (
                     <CheckCircle2 className="w-5 h-5 text-success" />
@@ -176,6 +178,7 @@ export default function QuestionCard({
                   )}
                   {isCorrect ? 'Correct!' : 'Incorrect'}
                 </h4>
+                <h2 className="text-[24px] my-5 font-semibold">Option is {alphabets[correctOptionAlphabet]} correct</h2>
                 <div
                   className="text-base leading-relaxed"
                   dangerouslySetInnerHTML={{ __html: explanation }}

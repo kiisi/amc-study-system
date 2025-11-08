@@ -31,7 +31,7 @@ export async function loginAccount(formData: FormData, request: Request) {
         const conn = await dbConnect();
     }
     catch (error) {
-        console.log(error)
+        console.log("==>", error)
         return {
             status: "error",
             message: 'An error occured while connecting to the server',
