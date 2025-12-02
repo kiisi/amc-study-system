@@ -103,7 +103,7 @@ export default function Landing() {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button 
                 size="lg" 
-                onClick={() => navigate('/login')}
+                onClick={() => navigate('/dashboard')}
                 data-testid="button-start-practicing"
               >
                 Start Practicing Free

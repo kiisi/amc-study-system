@@ -29,7 +29,10 @@ if (!cached) {
 
 async function dbConnect() {
 
+    console.log(process.env.NODE_ENV);
+
     if (process.env.NODE_ENV === "production") {
+        
         await mongoose.connect(MONGODB_URI);
 
         return {

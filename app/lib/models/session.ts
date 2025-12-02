@@ -15,6 +15,7 @@ export interface IQuestionAttempt extends Document {
 export interface ISession extends Document {
     mode: SESSION_MODE;
     currentIndex: Number;
+    numberOfQuestions: Number;
     questionAttempts: IQuestionAttempt[];
 }
 
@@ -46,6 +47,9 @@ const sessionSchema = new Schema<ISession>({
     currentIndex: {
         type: Number,
         default: 0,
+    },
+    numberOfQuestions: {
+        type: Number,
     },
     questionAttempts: [questionAttemptSchema]
 }, { timestamps: true }

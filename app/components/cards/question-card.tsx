@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import { cn } from "~/utils";
-import { useSearchParams } from "react-router";
+import { useNavigation, useSearchParams } from "react-router";
 
 interface QuestionCardProps {
   questionNumber: number;
@@ -35,6 +35,9 @@ export default function QuestionCard({
   correctAnswer,
   explanation,
 }: QuestionCardProps) {
+
+  const navigation = useNavigation();
+  const isNavigating = Boolean(navigation.location);
 
   const alphabets = ['A', 'B', 'C', 'D', 'E'];
 
@@ -203,6 +206,8 @@ export default function QuestionCard({
             // disabled={currentIndex === mockQuestions.length - 1}
             data-testid="button-next"
             onClick={() => setSearchParams({ page: String(questionNumber + 1) })}
+            isLoading={isNavigating}
+            className="min-w-[125px]"
           >
             Continue
             <ArrowRight className="w-4 h-4 ml-2" />

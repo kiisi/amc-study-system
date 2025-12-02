@@ -17,7 +17,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
 
 export default function PracticeMode({ loaderData }) {
-  
+
   const question = loaderData.data;
 
   const [searchParams] = useSearchParams();

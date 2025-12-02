@@ -1,4 +1,4 @@
-import { redirect } from "react-router";
+import { data, redirect } from "react-router";
 import dbConnect from "~/.server/db";
 import { QuestionModel } from "~/lib/models/question";
 import { SessionModel } from "~/lib/models/session";
@@ -18,8 +18,30 @@ export async function createQuizSession(formData: FormData, request: Request) {
         }
     }
 
+    let numberOfQuestions = formData.get("numberOfQuestions") as string;
+
+    console.log(Number(numberOfQuestions));
+
+    if (Number(numberOfQuestions ?? 0) < 25) {
+        return data({
+            error: true,
+            message: "Minimum number of questions is 25",
+        }, {
+            status: 400,
+        });
+    }
+
+    if (Number(numberOfQuestions ?? 0) > 150) {
+        return data({
+            error: true,
+            message: "Maximum number of questions is 150",
+        }, {
+            status: 400,
+        });
+    }
+
     try {
-        const session = await SessionModel.create({ mode })
+        const session = await SessionModel.create({ mode, numberOfQuestions })
 
         return redirect(`/practice-mode/${session._id}?page=${Number(session.currentIndex) + 1}`);
     }
@@ -32,7 +54,7 @@ export async function createQuizSession(formData: FormData, request: Request) {
     }
 }
 
-export async function loadQuizQuestion(sessionId, page) {
+export async function loadQuizQuestion(sessionId, page: string) {
     try {
         const conn = await dbConnect();
     }
