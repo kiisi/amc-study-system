@@ -64,6 +64,7 @@ export async function loginAccount(formData: FormData, request: Request) {
         );
 
         session.set("token", token);
+        session.set("userId", isExistingUser._id as string);
 
         return redirect("/dashboard", {
             headers: {

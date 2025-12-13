@@ -6,9 +6,10 @@ import { Button } from "../ui/button";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import { cn } from "~/utils";
-import { useNavigation, useSearchParams } from "react-router";
+import { Form, useFetcher, useNavigation, useSearchParams } from "react-router";
 
 interface QuestionCardProps {
+  questionId: string;
   questionNumber: number;
   totalQuestions: number;
   questionText: string;
@@ -25,7 +26,9 @@ interface QuestionCardProps {
   onFlag?: () => void;
 }
 
+
 export default function QuestionCard({
+  questionId,
   questionNumber,
   totalQuestions,
   questionText,
@@ -37,6 +40,9 @@ export default function QuestionCard({
 }: QuestionCardProps) {
 
   const navigation = useNavigation();
+
+  const fetcher = useFetcher();
+
   const isNavigating = Boolean(navigation.location);
 
   const alphabets = ['A', 'B', 'C', 'D', 'E'];
@@ -48,19 +54,19 @@ export default function QuestionCard({
   const [showFeedback, setShowFeedback] = useState(false);
 
   const handleSelect = (value: string) => {
-    console.log(value)
+    console.log("Handle select", value)
     setShowFeedback(true)
 
     setSelectedAnswer(value)
-  };
 
-  console.log("Selected answer", selectedAnswer)
+    fetcher.submit(
+      { questionId, userAnswer: value },
+      { method: "post" }
+    );
+  };
 
   const isCorrect = showFeedback && selectedAnswer !== null && selectedAnswer === correctAnswer;
   const isWrong = showFeedback && selectedAnswer !== null && selectedAnswer !== correctAnswer;
-
-  console.log("isCorrect", isCorrect)
-  console.log("isWrong", isWrong)
 
   const correctOptionAlphabet = options?.findIndex(item => item.option === correctAnswer); 
 
@@ -76,7 +82,7 @@ export default function QuestionCard({
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-muted-foreground" data-testid="text-question-counter">
-                Question {questionNumber}/{totalQuestions}
+                Question {questionNumber}/{totalQuestions ?? 0}
               </span>
               <Badge variant="secondary" data-testid="badge-subject">{subject}</Badge>
             </div>
@@ -130,8 +136,6 @@ export default function QuestionCard({
                 const isThisCorrect = showFeedback && option.option === correctAnswer;
                 const isThisSelected = selectedAnswer === option.option;
                 const isThisWrong = showFeedback && isThisSelected && option.option !== correctAnswer;
-
-                console.log(isThisWrong)
 
                 return (
                   <div
@@ -208,6 +212,7 @@ export default function QuestionCard({
             onClick={() => setSearchParams({ page: String(questionNumber + 1) })}
             isLoading={isNavigating}
             className="min-w-[125px]"
+            // type="button"
           >
             Continue
             <ArrowRight className="w-4 h-4 ml-2" />

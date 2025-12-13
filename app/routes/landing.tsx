@@ -1,12 +1,12 @@
 // import { Redirect } from "wouter";
-import { 
-  GraduationCap, 
-  Brain, 
-  Clock, 
-  Stethoscope, 
-  TrendingUp, 
-  Bookmark as BookmarkIcon, 
-  RotateCcw 
+import {
+  GraduationCap,
+  Brain,
+  Clock,
+  Stethoscope,
+  TrendingUp,
+  Bookmark as BookmarkIcon,
+  RotateCcw
 } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
@@ -17,9 +17,9 @@ export default function Landing() {
   const navigate = useNavigate()
   // const { isAuthenticated } = useAuth();
 
-//   if (isAuthenticated) {
-//     return <Redirect to="/dashboard" />;
-//   }
+  //   if (isAuthenticated) {
+  //     return <Redirect to="/dashboard" />;
+  //   }
 
   const features = [
     {
@@ -59,7 +59,7 @@ export default function Landing() {
       highlights: ["Session-specific reviews", "Wrong answers focus", "Spaced repetition"]
     }
   ];
-
+  
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -71,14 +71,14 @@ export default function Landing() {
               <h1 className="text-xl font-semibold text-foreground">AMC <span className="hidden lg:inline">Study System</span></h1>
             </div>
             <div className="flex items-center space-x-4">
-              <Button 
-                variant="ghost" 
+              <Button
+                variant="ghost"
                 onClick={() => navigate('/login')}
                 data-testid="button-login-header"
               >
                 Login
               </Button>
-              <Button 
+              <Button
                 onClick={() => navigate('/register')}
                 data-testid="button-signup-header"
               >
@@ -97,19 +97,19 @@ export default function Landing() {
               Master the <span className="text-primary">AMC Exams</span> with Confidence
             </h2>
             <p className="text-lg text-muted-foreground mb-8 leading-relaxed">
-              Comprehensive practice system with 150+ questions, timed exams, subject-specific training, 
+              Comprehensive practice system with 150+ questions, timed exams, subject-specific training,
               and detailed progress tracking. Prepare efficiently for your Medical Council examinations.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 onClick={() => navigate('/dashboard')}
                 data-testid="button-start-practicing"
               >
                 Start Practicing Free
               </Button>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="lg"
                 onClick={() => document.getElementById('features-section')?.scrollIntoView({ behavior: 'smooth' })}
                 data-testid="button-view-features"
@@ -119,9 +119,9 @@ export default function Landing() {
             </div>
           </div>
           <div className="hidden lg:block">
-            <img 
-              src="/landing/medical.jpg" 
-              alt="Medical students studying" 
+            <img
+              src="/landing/medical.jpg"
+              alt="Medical students studying"
               className="rounded-xl shadow-2xl w-full h-auto"
             />
           </div>
@@ -137,7 +137,7 @@ export default function Landing() {
               Everything you need to excel in your AMC examinations, designed by medical professionals
             </p>
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {features.map((feature, index) => (
               <Card key={index} className="bg-background hover:shadow-lg transition-shadow">

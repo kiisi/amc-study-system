@@ -1,8 +1,5 @@
-import { useState } from "react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
 import QuestionCard from "~/components/cards/question-card";
-import { Button } from "~/components/ui/button";
-import { loadQuizQuestion } from "./action";
+import { loadQuizQuestion, validateUserAnswer } from "./action";
 import { useSearchParams } from "react-router";
 
 
@@ -15,10 +12,27 @@ export async function loader({ params, request }: Route.LoaderArgs) {
   return data;
 }
 
+export async function action({
+  params,
+  request,
+}: Route.ActionArgs) {
+  let formData = await request.formData();
+
+  console.log("Form Data action trigger", formData)
+  console.log("Name: ", formData.get("name"))
+  console.log("Age: ", formData.get("message"))
+
+  return await validateUserAnswer(params.session, formData);
+}
+
 
 export default function PracticeMode({ loaderData }) {
 
-  const question = loaderData.data;
+  const sessionQuestions = loaderData.data;
+
+  const question = sessionQuestions.question;
+
+  console.log("Question ==>", sessionQuestions)
 
   const [searchParams] = useSearchParams();
 
@@ -33,8 +47,9 @@ export default function PracticeMode({ loaderData }) {
         </div>
 
         <QuestionCard
+          questionId={question._id}
           questionNumber={page}
-          totalQuestions={2}
+          totalQuestions={sessionQuestions.numberOfQuestions}
           questionText={question.questionText}
           questionImages={question.questionImages}
           subject={question.subject.name}

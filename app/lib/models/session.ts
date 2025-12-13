@@ -28,7 +28,7 @@ const questionAttemptSchema = new Schema<IQuestionAttempt>(
         },
         userAnswer: {
             type: String,
-            required: true,
+            required: false,
         },
         isCorrect: {
             type: Boolean,
