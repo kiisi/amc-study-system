@@ -308,7 +308,7 @@ const ResultsPage = () => {
         </div>
 
         {/* Topic Performance */}
-        <div className="bg-white rounded-xl border border-gray-300 p-6 mb-8">
+        {/* <div className="bg-white rounded-xl border border-gray-300 p-6 mb-8">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-indigo-50 rounded-lg flex items-center justify-center mr-3">
@@ -361,85 +361,11 @@ const ResultsPage = () => {
               );
             })}
           </div>
-        </div>
+        </div> */}
 
         {/* Question Review Section */}
-        <div className="bg-white rounded-xl border border-gray-300 p-6 mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center">
-              <h3 className="text-lg font-semibold text-gray-900">Question Review</h3>
-              <span className="ml-3 text-sm text-gray-600 bg-gray-100 px-2 py-1 rounded">
-                {totalQuestions} questions
-              </span>
-            </div>
-            <button 
-              onClick={handleShareResults}
-              className="flex items-center text-sm text-gray-600 hover:text-gray-900"
-            >
-              <Share2 className="w-4 h-4 mr-1" />
-              Share
-            </button>
-          </div>
 
-          <div className="space-y-4">
-            {questions.slice(0, 3).map((q) => (
-              <div 
-                key={q.id} 
-                className={`p-4 rounded-lg border-l-4 ${
-                  q.isCorrect 
-                    ? 'border-l-emerald-500 bg-emerald-50' 
-                    : 'border-l-rose-500 bg-rose-50'
-                }`}
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex-1">
-                    <div className="flex items-center mb-2">
-                      <span className="text-sm font-medium text-gray-900 mr-3">
-                        Question {q.id}
-                      </span>
-                      <span className="text-xs text-gray-600 bg-white px-2 py-1 rounded">
-                        {q.topic}
-                      </span>
-                    </div>
-                    <p className="text-gray-800 mb-3">{q.question}</p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <div className="text-gray-600 mb-1">Your Answer</div>
-                        <div className="font-medium text-gray-900">{q.userAnswer}</div>
-                      </div>
-                      <div>
-                        <div className="text-gray-600 mb-1">Correct Answer</div>
-                        <div className="font-medium text-gray-900">{q.correctAnswer}</div>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="ml-4 text-right">
-                    <div className={`text-sm font-medium px-3 py-1 rounded-full ${
-                      q.isCorrect 
-                        ? 'text-emerald-700 bg-emerald-100' 
-                        : 'text-rose-700 bg-rose-100'
-                    }`}>
-                      {q.isCorrect ? 'Correct' : 'Incorrect'}
-                    </div>
-                    <div className="text-xs text-gray-600 mt-2">{q.timeSpent}s</div>
-                  </div>
-                </div>
-              </div>
-            ))}
-            
-            {questions.length > 3 && (
-              <div className="text-center pt-4 border-t border-gray-200">
-                <button 
-                  onClick={() => {/* Navigate to detailed review */}}
-                  className="inline-flex items-center text-blue-600 hover:text-blue-800 text-sm font-medium"
-                >
-                  View all {questions.length} questions
-                  <ChevronRight className="w-4 h-4 ml-1" />
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
+        
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
