@@ -6,7 +6,7 @@ import { Button } from "../ui/button";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import { cn } from "~/utils";
-import { Form, useFetcher, useNavigation, useSearchParams } from "react-router";
+import { Form, useFetcher, useNavigate, useNavigation, useSearchParams } from "react-router";
 
 interface QuestionCardProps {
   questionId: string;
@@ -41,6 +41,8 @@ export default function QuestionCard({
 }: QuestionCardProps) {
 
   const navigation = useNavigation();
+
+  const navigate = useNavigate();
 
   const fetcher = useFetcher();
 
@@ -216,7 +218,7 @@ export default function QuestionCard({
           Previous
         </Button>
 
-        {(Boolean(userAnswer) || showFeedback) && (
+        {(Boolean(userAnswer) || showFeedback) && Number(questionNumber) < Number(totalQuestions) && (
           <Button
             // disabled={currentIndex === mockQuestions.length - 1}
             data-testid="button-next"
@@ -226,6 +228,20 @@ export default function QuestionCard({
             // type="button"
           >
             Continue
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        )}
+
+        {Number(questionNumber) === Number(totalQuestions) && (
+          <Button
+            // disabled={currentIndex === mockQuestions.length - 1}
+            data-testid="button-next"
+            onClick={() => navigate("result")}
+            isLoading={isNavigating}
+            className="min-w-[125px]"
+            // type="button"
+          >
+            Submit
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         )}

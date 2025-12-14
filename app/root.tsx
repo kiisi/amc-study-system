@@ -30,13 +30,36 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+BProgress.configure({
+  minimum: 0.08,
+  maximum: 1,
+  template: `<div class="bar" style="display: none">
+              <div class="peg">
+              </div>
+             </div>
+             <div class="spinner"><div class="spinner-icon"></div></div>
+             <div class="indeterminate"><div class="inc"></div><div class="dec"></div></div>`,
+  easing: 'linear',
+  positionUsing: 'width',
+  speed: 200,
+  trickle: true,
+  trickleSpeed: 200,
+  showSpinner: true,
+  indeterminate: false,
+  indeterminateSelector: '.indeterminate',
+  barSelector: '.bar',
+  spinnerSelector: '.spinner',
+  parent: 'body',
+  direction: 'ltr',
+});
+
 export function Layout({ children }: { children: React.ReactNode }) {
   let navigation = useNavigation();
 
   if (navigation.state === "loading") {
-      BProgress.start();
-    } else {
-      BProgress.done();
+    BProgress.start();
+  } else {
+    BProgress.done();
   }
 
   return (
@@ -100,7 +123,7 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
 
 
 async function timingMiddleware({ context }, next) {
-  
+
   console.log(`Navigating ...`);
   return next();
 }
