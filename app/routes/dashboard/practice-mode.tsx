@@ -56,6 +56,7 @@ export default function PracticeMode({ loaderData }) {
           options={question.options}
           correctAnswer={question.correctAnswer}
           explanation={question.explanation}
+          userAnswer={sessionQuestions.userAnswer}
         />
       </div>
     </div>

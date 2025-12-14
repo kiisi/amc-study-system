@@ -84,7 +84,6 @@ export async function loadQuizQuestion(sessionId: string, page: string | null) {
         const limit = 1;
         const skip = (pageNumber - 1) * limit;
 
-        // const question = await QuestionModel.findOne().skip(skip).limit(1).populate("subject").lean();
         const sessionQuestions = await SessionModel.findById(sessionId)
             .populate({
                 path: "questionAttempts.question",
@@ -100,15 +99,38 @@ export async function loadQuizQuestion(sessionId: string, page: string | null) {
         });;
 
         // 2️⃣ Pick the questionAttempts slice for this page
+        console.log(skip, skip + limit)
         const questionAttemptPage = sessionQuestions.questionAttempts.slice(skip, skip + limit);
+
+        if (questionAttemptPage[0]?.userAnswer) {
+            const payload = {
+                mode: sessionQuestions.mode,
+                ...(serializeMongoIds(questionAttemptPage[0])),
+                numberOfQuestions: sessionQuestions.numberOfQuestions,
+            }
+
+            return data<any>({
+                success: true,
+                message: "Question loaded successfully",
+                data: payload,
+            }, {
+                status: 200,
+            });
+        }
+
+        const questionWithoutAnswer = serializeMongoIds(questionAttemptPage[0]);
 
         const payload = {
             mode: sessionQuestions.mode,
-            ...(serializeMongoIds(questionAttemptPage[0])),
+            ...questionWithoutAnswer,
+            question: {
+                ...questionWithoutAnswer.question,
+                correctAnswer: undefined,
+                explanation: undefined,
+
+            },
             numberOfQuestions: sessionQuestions.numberOfQuestions,
         }
-
-        console.log(payload)
 
         return data<any>({
             success: true,
@@ -128,10 +150,8 @@ export async function loadQuizQuestion(sessionId: string, page: string | null) {
 
 export async function validateUserAnswer(sessionId: string, formData: FormData) {
 
-    let name = formData.get("questionId") as string;
-    let message = formData.get("userAnswer") as string;
-
-    console.log(name, message);
+    let questionId = formData.get("questionId") as string;
+    let userAnswer = formData.get("userAnswer") as string;
 
     try {
         const conn = await dbConnect();
@@ -147,10 +167,22 @@ export async function validateUserAnswer(sessionId: string, formData: FormData) 
     try {
         const question = await QuestionModel.findOne().populate("subject").lean();
 
+        const session = await SessionModel.updateOne(
+            {
+                _id: sessionId,
+                "questionAttempts.question": questionId,
+            },
+            {
+                $set: {
+                    "questionAttempts.$.userAnswer": userAnswer,
+                    // "questionAttempts.$.isCorrect": isCorrect,
+                },
+            }
+        );
+
         return data({
             success: true,
-            message: "Question loaded successfully",
-            data: serializeMongoIds(question),
+            message: "Submitted",
         }, {
             status: 200,
         });
