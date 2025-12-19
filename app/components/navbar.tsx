@@ -1,6 +1,8 @@
 import { LogOutIcon, LucideLogOut } from "lucide-react";
 import BrandLogo from "./core/brand-logo";
 import { Button } from "./ui/button";
+import { Form, redirect } from "react-router";
+
 
 export default function NavBar() {
     return (
@@ -9,12 +11,14 @@ export default function NavBar() {
                 <div className="flex justify-between items-center h-16">
                     <BrandLogo to="/dashboard" />
                     <div className="flex items-center space-x-4">
-                        <Button
-                            data-testid="button-logout-header"
-                        >
-                            <LucideLogOut />
-                            Logout
-                        </Button>
+                        <Form method="post">
+                            <Button
+                                data-testid="button-logout-header"
+                            >
+                                <LucideLogOut />
+                                Logout
+                            </Button>
+                        </Form>
                     </div>
                 </div>
             </div>

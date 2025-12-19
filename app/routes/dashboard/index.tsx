@@ -1,4 +1,4 @@
-import { Link } from "react-router";
+import { data, Link, redirect } from "react-router";
 // import { useQuery } from "@tanstack/react-query";
 // import { useAuth } from "@/hooks/use-auth";
 // import { Button } from "@/components/ui/button";
@@ -18,8 +18,44 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
-import BrandLogo from "~/components/core/brand-logo";
 import NavBar from "~/components/navbar";
+import { destroySession, getSession } from "~/.server/sessions";
+
+// export async function loader({
+//   request,
+// }: Route.LoaderArgs) {
+//   const session = await getSession(
+//     request.headers.get("Cookie"),
+//   );
+//   console.log("User ID >" ,session.has("userId"));
+//   if (!session.has("userId")) {
+//     // Redirect to the home page if they are already signed in.
+//     return redirect("/login");
+//   }
+
+//   return data(
+//     { success: session.get("userId") },
+//     {
+//       headers: {
+//         "Set-Cookie": await commitSession(session),
+//       },
+//     },
+//   );
+// }
+
+export async function action({
+  request,
+}: Route.ActionArgs) {
+  const session = await getSession(
+    request.headers.get("Cookie"),
+  );
+  
+  return redirect("/login", {
+    headers: {
+      "Set-Cookie": await destroySession(session),
+    },
+  });
+}
 
 export default function Dashboard() {
     // const { user } = useAuth();
