@@ -18,6 +18,8 @@ import {
 } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
+import BrandLogo from "~/components/core/brand-logo";
+import NavBar from "~/components/navbar";
 
 export default function Dashboard() {
     // const { user } = useAuth();
@@ -49,23 +51,7 @@ export default function Dashboard() {
 
   return (
     <div>
-      <header className="bg-card shadow-sm border-b border-border">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <GraduationCap className="text-primary text-2xl mr-3" />
-              <h1 className="text-xl font-semibold text-foreground">AMC <span className="hidden lg:inline">Study System</span></h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <Button
-                data-testid="button-signup-header"
-              >
-                Logout
-              </Button>
-            </div>
-          </div>
-        </div>
-      </header>
+      <NavBar />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 
@@ -78,7 +64,7 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">

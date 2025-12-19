@@ -99,7 +99,6 @@ export async function loadQuizQuestion(sessionId: string, page: string | null) {
         });;
 
         // 2️⃣ Pick the questionAttempts slice for this page
-        console.log(skip, skip + limit)
         const questionAttemptPage = sessionQuestions.questionAttempts.slice(skip, skip + limit);
 
         if (questionAttemptPage[0]?.userAnswer) {
@@ -165,9 +164,9 @@ export async function validateUserAnswer(sessionId: string, formData: FormData) 
     }
 
     try {
-        const question = await QuestionModel.findOne().populate("subject").lean();
+        const question = await QuestionModel.findById(questionId);
 
-        const session = await SessionModel.updateOne(
+        await SessionModel.updateOne(
             {
                 _id: sessionId,
                 "questionAttempts.question": questionId,
@@ -175,7 +174,7 @@ export async function validateUserAnswer(sessionId: string, formData: FormData) 
             {
                 $set: {
                     "questionAttempts.$.userAnswer": userAnswer,
-                    // "questionAttempts.$.isCorrect": isCorrect,
+                    "questionAttempts.$.isCorrect": userAnswer == question.correctAnswer,
                 },
             }
         );
@@ -194,46 +193,4 @@ export async function validateUserAnswer(sessionId: string, formData: FormData) 
             message: 'An error occured while connecting to the server',
         }
     }
-
-    // let numberOfQuestions = formData.get("numberOfQuestions") as string;
-
-    // console.log(Number(numberOfQuestions));
-
-    // if (Number(numberOfQuestions ?? 0) < 25) {
-    //     return data({
-    //         error: true,
-    //         message: "Minimum number of questions is 25",
-    //     }, {
-    //         status: 400,
-    //     });
-    // }
-
-    // if (Number(numberOfQuestions ?? 0) > 150) {
-    //     return data({
-    //         error: true,
-    //         message: "Maximum number of questions is 150",
-    //     }, {
-    //         status: 400,
-    //     });
-    // }
-
-    // try {
-    //     const session = await SessionModel.create({ mode, numberOfQuestions })
-
-    //     return redirect(`/practice-mode/${session._id}?page=${Number(session.currentIndex) + 1}`);
-    // }
-    // catch (error) {
-    //     console.log(error)
-    //     return {
-    //         status: "error",
-    //         message: 'An error occured while connecting to the server',
-    //     }
-    // }
-
-    return data({
-        error: true,
-        message: "Data success",
-    }, {
-        status: 200,
-    });
 }
