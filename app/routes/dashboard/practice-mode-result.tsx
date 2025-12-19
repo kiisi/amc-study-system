@@ -225,7 +225,7 @@ const ResultsPage = () => {
           </div>
 
           {/* Performance Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-8 mb-8">
             <div className="bg-white rounded-xl border border-gray-300 p-6">
               <div className="flex items-center mb-4">
                 <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center mr-3">

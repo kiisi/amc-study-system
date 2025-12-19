@@ -1,7 +1,7 @@
 import { data, redirect } from "react-router";
 import dbConnect from "~/.server/db";
 import { QuestionModel } from "~/lib/models/question";
-import { SessionModel, type IQuestionAttempt, type ISession } from "~/lib/models/session";
+import { SESSION_STATUS, SessionModel, type IQuestionAttempt, type ISession } from "~/lib/models/session";
 import { serializeMongoIds } from "~/utils/serialize";
 
 export async function createQuizSession(formData: FormData, request: Request) {
@@ -191,6 +191,49 @@ export async function validateUserAnswer(sessionId: string, formData: FormData) 
         return {
             status: "error",
             message: 'An error occured while connecting to the server',
+        }
+    }
+}
+
+export async function submitPracticeModeQuiz(sessionId: string, formData: FormData) {
+
+    if (!sessionId) {
+        return data({
+            success: true,
+            message: "Session ID not found",
+        }, {
+            status: 404,
+        });
+    }
+
+    try {
+        const conn = await dbConnect();
+    }
+    catch (error) {
+        console.log(error)
+        return {
+            status: "error",
+            message: 'An error occured while connecting to the server',
+        }
+    }
+
+    try {
+        await SessionModel.findByIdAndUpdate(
+            sessionId,
+            {
+                status: SESSION_STATUS.COMPLETED,
+                completedAt: new Date(),
+            },
+            { new: true }
+        );
+
+        return redirect(`/session/${sessionId}/result`)
+    }
+    catch (error) {
+        console.log(error)
+        return {
+            status: "error",
+            message: 'An error occured',
         }
     }
 }

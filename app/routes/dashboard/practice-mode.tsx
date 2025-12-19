@@ -1,5 +1,5 @@
 import QuestionCard from "~/components/cards/question-card";
-import { loadQuizQuestion, validateUserAnswer } from "./action";
+import { loadQuizQuestion, submitPracticeModeQuiz, validateUserAnswer } from "./action";
 import { useSearchParams } from "react-router";
 
 
@@ -19,8 +19,12 @@ export async function action({
   let formData = await request.formData();
 
   console.log("Form Data action trigger", formData)
-  console.log("Name: ", formData.get("name"))
-  console.log("Age: ", formData.get("message"))
+  
+  const intent = formData.get("intent");
+
+  if (intent == "submit") {
+    return await submitPracticeModeQuiz(params.session, formData);
+  }
 
   return await validateUserAnswer(params.session, formData);
 }

@@ -6,6 +6,11 @@ export enum SESSION_MODE {
     EXAM = "exam",
 }
 
+export enum SESSION_STATUS {
+    IN_PROGESS = "in_progress",
+    COMPLETED = "completed",
+}
+
 export interface IQuestionAttempt extends Document {
     question: IQuestion["_id"]; // reference to the Question
     userAnswer: string; // what the user picked
@@ -14,9 +19,11 @@ export interface IQuestionAttempt extends Document {
 
 export interface ISession extends Document {
     mode: SESSION_MODE;
+    status: SESSION_STATUS;
     currentIndex: Number;
     numberOfQuestions: Number;
     questionAttempts: IQuestionAttempt[];
+    completedAt: Date | null;
 }
 
 const questionAttemptSchema = new Schema<IQuestionAttempt>(
@@ -51,7 +58,16 @@ const sessionSchema = new Schema<ISession>({
     numberOfQuestions: {
         type: Number,
     },
-    questionAttempts: [questionAttemptSchema]
+    status: {
+        type: String,
+        enum: Object.values(SESSION_STATUS),
+        default: SESSION_STATUS.IN_PROGESS,
+    },
+    completedAt: {
+        type: Date,
+        default: null,
+    },
+    questionAttempts: [questionAttemptSchema],
 }, { timestamps: true }
 );
 

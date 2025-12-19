@@ -13,9 +13,6 @@ async function authMiddleware(
     );
 
     const token = session.get("token")
-    console.log("Token ", token);
-
-    console.log(session.get("userId"));
 
     if (!token) {
         throw redirect("/login", {
