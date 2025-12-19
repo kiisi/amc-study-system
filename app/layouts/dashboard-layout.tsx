@@ -2,14 +2,6 @@ import { redirect } from "react-router";
 import { destroySession, getSession } from "~/.server/sessions";
 import type { Route } from "../+types/root";
 
-export function Layout({
-    children,
-}: {
-    children: React.ReactNode;
-}) {
-    return children;
-}
-
 async function authMiddleware(
     { request }: { request: Request },
     next: () => Promise<Response>,
@@ -23,7 +15,7 @@ async function authMiddleware(
     const token = session.get("token")
 
     if (!token) {
-        return redirect("/login", {
+        throw redirect("/login", {
             headers: {
                 "Set-Cookie": await destroySession(session),
             },
@@ -38,3 +30,11 @@ async function authMiddleware(
 export const middleware: Route.MiddlewareFunction[] = [
     authMiddleware,
 ];
+
+export function Layout({
+    children,
+}: {
+    children: React.ReactNode;
+}) {
+    return children;
+}

@@ -7,11 +7,16 @@ import {
   ScrollRestoration,
   type AppLoadContext,
 } from "react-router";
+import { ProgressProvider } from '@bprogress/react';
 
 import type { Route } from "./+types/root";
 import "./app.css";
 import { rootContext } from "./contexts";
 import { Toaster } from "react-hot-toast";
+import { useNavigation } from "react-router";
+import { useEffect } from "react";
+import { BProgress } from "@bprogress/core";
+import Footer from "./components/footer";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -26,7 +31,38 @@ export const links: Route.LinksFunction = () => [
   },
 ];
 
+BProgress.configure({
+  minimum: 0.08,
+  maximum: 1,
+  template: `<div class="bar" style="display: none">
+              <div class="peg">
+              </div>
+             </div>
+             <div class="spinner"><div class="spinner-icon"></div></div>
+             <div class="indeterminate"><div class="inc"></div><div class="dec"></div></div>`,
+  easing: 'linear',
+  positionUsing: 'width',
+  speed: 200,
+  trickle: true,
+  trickleSpeed: 200,
+  showSpinner: true,
+  indeterminate: false,
+  indeterminateSelector: '.indeterminate',
+  barSelector: '.bar',
+  spinnerSelector: '.spinner',
+  parent: 'body',
+  direction: 'ltr',
+});
+
 export function Layout({ children }: { children: React.ReactNode }) {
+  let navigation = useNavigation();
+
+  if (navigation.state === "loading") {
+    BProgress.start();
+  } else {
+    BProgress.done();
+  }
+
   return (
     <html lang="en">
       <head>
@@ -36,16 +72,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body>
-        {children}
-        <ScrollRestoration />
-        <Scripts />
-        <Toaster
-          position="top-center"
-          reverseOrder={false}
-          toastOptions={{
-            duration: 2500,
-          }}
-        />
+        <ProgressProvider>
+          {children}
+          <ScrollRestoration />
+          <Scripts />
+          <Toaster
+            position="top-center"
+            reverseOrder={false}
+            toastOptions={{
+              duration: 2500,
+            }}
+          />
+        </ProgressProvider>
+        <Footer />
       </body>
     </html>
   );
@@ -84,3 +123,12 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
   );
 }
 
+
+async function timingMiddleware({ context }, next) {
+
+  console.log(`Navigating ...`);
+  return next();
+}
+
+export const middleware: Route.ClientMiddlewareFunction[] =
+  [timingMiddleware];

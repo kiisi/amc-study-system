@@ -1,5 +1,5 @@
 import { CheckCircle2, CircleAlert, GraduationCap } from "lucide-react";
-import { Link, useFetcher } from "react-router";
+import { data, Link, useFetcher } from "react-router";
 import { loginAccount } from "./action";
 import { Button } from "../../components/ui/button";
 import TextInput from "../../components/ui/text-input";
@@ -14,6 +14,28 @@ export async function action({
 
     return await loginAccount(formData, request)
 }
+
+// export async function loader({
+//   request,
+// }: Route.LoaderArgs) {
+//   const session = await getSession(
+//     request.headers.get("Cookie"),
+//   );
+//   console.log("User ID >" ,session.has("userId"));
+//   if (session.has("userId")) {
+//     // Redirect to the home page if they are already signed in.
+//     return redirect("/dashboard");
+//   }
+
+//   return data(
+//     { error: session.get("error") },
+//     {
+//       headers: {
+//         "Set-Cookie": await commitSession(session),
+//       },
+//     },
+//   );
+// }
 
 
 export default function Login() {

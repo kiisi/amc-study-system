@@ -6,9 +6,10 @@ import { Button } from "../ui/button";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import { cn } from "~/utils";
-import { useNavigation, useSearchParams } from "react-router";
+import { Form, useFetcher, useNavigate, useNavigation, useSearchParams } from "react-router";
 
 interface QuestionCardProps {
+  questionId: string;
   questionNumber: number;
   totalQuestions: number;
   questionText: string;
@@ -18,6 +19,7 @@ interface QuestionCardProps {
   correctAnswer?: string;
   selectedAnswer?: number;
   explanation?: string;
+  userAnswer?: string;
   showFeedback?: boolean;
   isBookmarked?: boolean;
   onAnswerSelect?: (index: number) => void;
@@ -26,6 +28,7 @@ interface QuestionCardProps {
 }
 
 export default function QuestionCard({
+  questionId,
   questionNumber,
   totalQuestions,
   questionText,
@@ -34,9 +37,15 @@ export default function QuestionCard({
   options,
   correctAnswer,
   explanation,
+  userAnswer,
 }: QuestionCardProps) {
 
   const navigation = useNavigation();
+
+  const navigate = useNavigate();
+
+  const fetcher = useFetcher();
+
   const isNavigating = Boolean(navigation.location);
 
   const alphabets = ['A', 'B', 'C', 'D', 'E'];
@@ -48,19 +57,28 @@ export default function QuestionCard({
   const [showFeedback, setShowFeedback] = useState(false);
 
   const handleSelect = (value: string) => {
-    console.log(value)
+    console.log("Handle select", value)
     setShowFeedback(true)
 
     setSelectedAnswer(value)
+
+    fetcher.submit(
+      { questionId, userAnswer: value },
+      { method: "post" }
+    );
   };
 
-  console.log("Selected answer", selectedAnswer)
+  const handleSubmit = () => {
+    fetcher.submit(
+      { intent: "submit" },
+      { method: "post" }
+    );
+  };
 
-  const isCorrect = showFeedback && selectedAnswer !== null && selectedAnswer === correctAnswer;
-  const isWrong = showFeedback && selectedAnswer !== null && selectedAnswer !== correctAnswer;
+  const isCorrect = selectedAnswer != null ? (showFeedback && selectedAnswer !== null && selectedAnswer === correctAnswer) : (Boolean(userAnswer) && userAnswer === correctAnswer); 
 
-  console.log("isCorrect", isCorrect)
-  console.log("isWrong", isWrong)
+  console.log("Is Correct", isCorrect)
+  // const isWrong = showFeedback && selectedAnswer !== null && selectedAnswer !== correctAnswer;
 
   const correctOptionAlphabet = options?.findIndex(item => item.option === correctAnswer); 
 
@@ -76,7 +94,7 @@ export default function QuestionCard({
           <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-muted-foreground" data-testid="text-question-counter">
-                Question {questionNumber}/{totalQuestions}
+                Question {questionNumber}/{totalQuestions ?? 0}
               </span>
               <Badge variant="secondary" data-testid="badge-subject">{subject}</Badge>
             </div>
@@ -124,21 +142,23 @@ export default function QuestionCard({
             )
           }
 
-          <RadioGroup value={selectedAnswer} onValueChange={(val) => handleSelect(val)}>
+          <RadioGroup value={userAnswer ?? selectedAnswer} onValueChange={(val) => handleSelect(val)}>
             <div className="space-y-3">
               {options.map((option, index) => {
-                const isThisCorrect = showFeedback && option.option === correctAnswer;
-                const isThisSelected = selectedAnswer === option.option;
-                const isThisWrong = showFeedback && isThisSelected && option.option !== correctAnswer;
-
-                console.log(isThisWrong)
+                const isThisCorrect = (Boolean(userAnswer) || showFeedback) && option.option === correctAnswer;
+                const isThisSelected = (selectedAnswer ?? userAnswer) === option.option;
+                const isThisWrong = (fetcher.state == "idle") && (Boolean(userAnswer) || showFeedback) && isThisSelected && option.option !== correctAnswer;
+                console.log("Fetcher State", fetcher.state, isThisWrong);
 
                 return (
                   <div
                     key={index}
                     className={cn("flex items-start space-x-3 p-4 rounded-md border-2 transition-colors", isThisSelected
                       ? 'border-primary bg-primary/5'
-                      : 'border-border hover-elevate', isThisCorrect && 'border-success bg-success/5', isThisWrong && "border-error bg-error/5",)}
+                      : 'border-border hover-elevate', 
+                      isThisCorrect && 'border-success bg-success/5', 
+                      isThisWrong && "border-error bg-error/5"
+                    )}
                     data-testid={`option-${index}`}
                   >
 
@@ -146,7 +166,7 @@ export default function QuestionCard({
                       <RadioGroupItem
                         value={option.option}
                         id={`option-${index}`}
-                        disabled={showFeedback}
+                        disabled={showFeedback || !!userAnswer}
                       />
                       <div className="font-normal leading-[140%]">
                         {alphabets[index]}
@@ -158,10 +178,10 @@ export default function QuestionCard({
                     >
                       {option.option}
                     </Label>
-                    {showFeedback && isThisCorrect && (
+                    {(Boolean(userAnswer) || showFeedback) && isThisCorrect && (
                       <CheckCircle2 className="w-6 h-6 text-success flex-shrink-0" />
                     )}
-                    {showFeedback && isThisWrong && (
+                    {(Boolean(userAnswer) || showFeedback) && isThisWrong && (
                       <XCircle className="w-6 h-6 text-error flex-shrink-0" />
                     )}
                   </div>
@@ -170,7 +190,7 @@ export default function QuestionCard({
             </div>
           </RadioGroup>
 
-          {showFeedback && explanation && (
+          {(Boolean(userAnswer) || showFeedback) && explanation && (
             <Card className="bg-muted/50" data-testid="card-explanation">
               <CardContent className="p-4 md:p-6 space-y-2">
                 <h4 className="font-semibold text-lg flex items-center gap-2">
@@ -194,22 +214,38 @@ export default function QuestionCard({
       <div className="flex items-center justify-between">
         <Button
           variant="outline"
-          // disabled={}
+          disabled={Number(questionNumber) == 1}
           data-testid="button-previous"
+          type="button"
+          onClick={ () => setSearchParams({ page: String(questionNumber - 1) })}
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Previous
         </Button>
 
-        {showFeedback && (
+        {(Boolean(userAnswer) || showFeedback) && Number(questionNumber) < Number(totalQuestions) && (
           <Button
             // disabled={currentIndex === mockQuestions.length - 1}
             data-testid="button-next"
             onClick={() => setSearchParams({ page: String(questionNumber + 1) })}
             isLoading={isNavigating}
             className="min-w-[125px]"
+            // type="button"
           >
             Continue
+            <ArrowRight className="w-4 h-4 ml-2" />
+          </Button>
+        )}
+
+        {Number(questionNumber) === Number(totalQuestions) && (
+          <Button
+            data-testid="button-next"
+            isLoading={isNavigating}
+            className="min-w-[125px]"
+            type="submit"
+            onClick={handleSubmit}
+          >
+            Submit
             <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         )}
