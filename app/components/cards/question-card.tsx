@@ -68,7 +68,12 @@ export default function QuestionCard({
     );
   };
 
-  // const isCorrect = showFeedback && selectedAnswer !== null && selectedAnswer === correctAnswer;
+  const handleSubmit = () => {
+    fetcher.submit(
+      { intent: "submit" },
+      { method: "post" }
+    );
+  };
 
   const isCorrect = selectedAnswer != null ? (showFeedback && selectedAnswer !== null && selectedAnswer === correctAnswer) : (Boolean(userAnswer) && userAnswer === correctAnswer); 
 
@@ -234,12 +239,11 @@ export default function QuestionCard({
 
         {Number(questionNumber) === Number(totalQuestions) && (
           <Button
-            // disabled={currentIndex === mockQuestions.length - 1}
             data-testid="button-next"
-            onClick={() => navigate("result")}
             isLoading={isNavigating}
             className="min-w-[125px]"
-            // type="button"
+            type="submit"
+            onClick={handleSubmit}
           >
             Submit
             <ArrowRight className="w-4 h-4 ml-2" />

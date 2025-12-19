@@ -2,6 +2,7 @@ import { data, redirect } from "react-router";
 import dbConnect from "~/.server/db";
 import { QuestionModel } from "~/lib/models/question";
 import { SESSION_STATUS, SessionModel, type IQuestionAttempt, type ISession } from "~/lib/models/session";
+import { formatTime } from "~/utils";
 import { serializeMongoIds } from "~/utils/serialize";
 
 export async function createQuizSession(formData: FormData, request: Request) {
@@ -57,7 +58,7 @@ export async function createQuizSession(formData: FormData, request: Request) {
             questionAttempts,
         });
 
-        return redirect(`/practice-mode/${session._id}?page=${Number(session.currentIndex) + 1}`);
+        return redirect(`/practice-mode/${session._id}?page=1`);
     }
     catch (error) {
         console.log(error)
@@ -142,7 +143,7 @@ export async function loadQuizQuestion(sessionId: string, page: string | null) {
     catch (error) {
         return {
             status: "error",
-            message: 'An error occured while connecting to the server',
+            message: 'An error occured',
         }
     }
 }
@@ -195,7 +196,73 @@ export async function validateUserAnswer(sessionId: string, formData: FormData) 
     }
 }
 
-export async function submitPracticeModeQuiz(sessionId: string, formData: FormData) {
+export async function submitPracticeModeQuiz(sessionId: string) {
+
+    console.log("sessionId", sessionId);
+    if (!sessionId) {
+        return data({
+            success: true,
+            message: "Session ID not found",
+        }, {
+            status: 404,
+        });
+    }
+
+    try {
+        const conn = await dbConnect();
+    }
+    catch (error) {
+        console.log(error)
+        return {
+            status: "error",
+            message: 'An error occured while connecting to the server',
+        }
+    }
+
+    try {
+        const session = await SessionModel.findById(sessionId);
+
+        if (!session) {
+            return data({
+                success: false,
+                message: "Session not found"
+            }, {
+                status: 400,
+            });
+        }
+
+        // 2️⃣ Check if it has already ended
+        if (session.completedAt) {
+            return data({
+                success: true,
+                message: "Quiz has already ended ✅"
+            }, {
+                status: 200,
+            })
+        }
+        await SessionModel.findByIdAndUpdate(
+            sessionId,
+            {
+                status: SESSION_STATUS.COMPLETED,
+                completedAt: new Date(),
+            },
+            { new: true }
+        );
+
+        return redirect(`/practice-mode/${sessionId}/result`)
+    }
+    catch (error) {
+        console.log(error)
+        return data({
+            status: "error",
+            message: 'An error occured',
+        }, {
+            status: 400
+        })
+    }
+}
+
+export async function practiceModeQuizResult(sessionId: string) {
 
     if (!sessionId) {
         return data({
@@ -218,22 +285,61 @@ export async function submitPracticeModeQuiz(sessionId: string, formData: FormDa
     }
 
     try {
-        await SessionModel.findByIdAndUpdate(
-            sessionId,
-            {
-                status: SESSION_STATUS.COMPLETED,
-                completedAt: new Date(),
-            },
-            { new: true }
-        );
+        const session = await SessionModel.findById(sessionId);
 
-        return redirect(`/session/${sessionId}/result`)
+        if (!session) {
+            return data({
+                success: false,
+                message: "Session not found"
+            }, {
+                status: 400,
+            });
+        }
+
+        const correctAnswers = session.questionAttempts.filter(data => data.isCorrect).length;
+
+        const wrongAnswers = session.questionAttempts.filter(data => !data.isCorrect).length;
+
+        const unAttemptedQuestions = session.questionAttempts.filter(data => data?.userAnswer === undefined || data.userAnswer === null || data.userAnswer === "").length;
+
+        const totalQuestions = session.numberOfQuestions as number;
+
+        const percentage = (correctAnswers / totalQuestions) * 100;
+
+        const start = new Date(session.createdAt).getTime();
+
+        const end = new Date(session.completedAt).getTime();
+
+        const timeUsedMs = end - start;
+
+        const attemptedQuestions = totalQuestions - unAttemptedQuestions
+
+        const averageTimeUsed = attemptedQuestions > 0 ? (timeUsedMs / 1000) / attemptedQuestions : 0; 
+
+        return data({
+            success: true,
+            messsage: "Quiz result fetched.",
+            data: {
+                unAttemptedQuestions,
+                wrongAnswers,
+                correctAnswers,
+                totalQuestions,
+                percentage,
+                timeUsed: formatTime(timeUsedMs),
+                date: session.completedAt,
+                averageTimeUsed: Math.round(averageTimeUsed),
+            }
+        }, {
+            status: 200,
+        })
     }
     catch (error) {
         console.log(error)
-        return {
+        return data({
             status: "error",
             message: 'An error occured',
-        }
+        }, {
+            status: 400
+        })
     }
 }

@@ -20,10 +20,11 @@ export interface IQuestionAttempt extends Document {
 export interface ISession extends Document {
     mode: SESSION_MODE;
     status: SESSION_STATUS;
-    currentIndex: Number;
     numberOfQuestions: Number;
     questionAttempts: IQuestionAttempt[];
-    completedAt: Date | null;
+    completedAt: Date;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 const questionAttemptSchema = new Schema<IQuestionAttempt>(
@@ -50,10 +51,6 @@ const sessionSchema = new Schema<ISession>({
         type: String,                          // ✅ Must specify type
         enum: Object.values(SESSION_MODE),    // ✅ enum applies here
         required: true,
-    },
-    currentIndex: {
-        type: Number,
-        default: 0,
     },
     numberOfQuestions: {
         type: Number,

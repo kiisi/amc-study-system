@@ -19,68 +19,48 @@ import {
   HashIcon
 } from 'lucide-react';
 import NavBar from '~/components/navbar';
+import { practiceModeQuizResult } from './action';
 
-const ResultsPage = () => {
+export async function loader({ params, request }: Route.LoaderArgs) {
+  const url = new URL(request.url);
+  const page = url.searchParams.get("page");
+
+  const data = await practiceModeQuizResult(params.session);
+
+  return data;
+}
+
+export default function QuizResult({ loaderData }) {
+
+  console.log(loaderData)
+  const quizResultData = loaderData.data;
   const location = useLocation();
   const navigate = useNavigate();
-  const [quizResults, setQuizResults] = useState(null);
-  const [timeSpent, setTimeSpent] = useState(0);
 
-  useEffect(() => {
-    const mockResults = location.state || {
-      score: 49,
-      totalQuestions: 20,
-      correctAnswers: 16,
-      incorrectAnswers: 4,
-      timeLimit: 1800,
-      timeUsed: 1320,
-      category: 'JavaScript Fundamentals',
-      difficulty: 'Intermediate',
-      date: new Date().toISOString(),
-      questions: Array(20).fill(null).map((_, i) => ({
-        id: i + 1,
-        question: `What is the output of console.log(typeof null)?`,
-        userAnswer: i < 16 ? 'object' : 'null',
-        correctAnswer: 'object',
-        isCorrect: i < 16,
-        timeSpent: Math.floor(Math.random() * 60) + 20,
-        category: ['Variables & Types', 'Functions', 'DOM', 'Async'][i % 4],
-        topic: ['Data Types', 'Closures', 'Event Handling', 'Promises'][i % 4]
-      }))
-    };
+  const score = quizResultData.percentage;
+  const totalQuestions = quizResultData.totalQuestions;
+  const correctAnswers = quizResultData.correctAnswers;
+  const incorrectAnswers = quizResultData.wrongAnswers;
+  const timeLimit = 1800;
+  const timeUsed = quizResultData.timeUsed;
+  const date = quizResultData.date;
+  const averageTimeUsed = quizResultData.averageTimeUsed;
 
-    setQuizResults(mockResults);
-    setTimeSpent(mockResults.timeUsed);
-  }, [location.state]);
-
-  if (!quizResults) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-pulse space-y-4">
-            <div className="h-4 bg-gray-200 rounded w-32 mx-auto"></div>
-            <div className="h-8 bg-gray-300 rounded w-48 mx-auto"></div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  const {
-    score,
-    totalQuestions,
-    correctAnswers,
-    incorrectAnswers,
-    timeLimit,
-    category,
-    difficulty,
-    date,
-    questions
-  } = quizResults;
+  // if (!quizResults) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+  //       <div className="text-center">
+  //         <div className="animate-pulse space-y-4">
+  //           <div className="h-4 bg-gray-200 rounded w-32 mx-auto"></div>
+  //           <div className="h-8 bg-gray-300 rounded w-48 mx-auto"></div>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   const percentage = score;
-  const timePercentage = (timeSpent / timeLimit) * 100;
-  const formattedTime = `${Math.floor(timeSpent / 60)}:${(timeSpent % 60).toString().padStart(2, '0')}`;
+  const formattedTime = timeUsed;
   const formattedDate = new Date(date).toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -88,7 +68,7 @@ const ResultsPage = () => {
   });
   const accuracy = (correctAnswers / totalQuestions) * 100;
 
-  const getPerformanceColor = (score) => {
+  const getPerformanceColor = (score: number) => {
     if (score >= 90) return 'text-emerald-600';
     if (score >= 70) return 'text-green-600';
     if (score >= 60) return 'text-blue-600';
@@ -96,7 +76,7 @@ const ResultsPage = () => {
     return 'text-rose-600';
   };
 
-  const getPerformanceText = (score) => {
+  const getPerformanceText = (score: number) => {
     if (score >= 90) return 'Excellent Performance';
     if (score >= 70) return 'Strong Performance';
     if (score >= 60) return 'Good Performance';
@@ -104,7 +84,7 @@ const ResultsPage = () => {
     return 'Keep Practicing';
   };
 
-  const getScoreColor = (score) => {
+  const getScoreColor = (score: number) => {
     if (score >= 90) return 'bg-gradient-to-r from-green-50 to-emerald-50';
     if (score >= 70) return 'from-blue-500 to-indigo-600';
     if (score >= 60) return 'from-amber-500 to-orange-600';
@@ -144,7 +124,7 @@ const ResultsPage = () => {
             </div>
           </div>
 
-          <div className='mb-4 lg:mb-8 gap-4 lg:gap-8 grid md:grid-cols-[360px_1fr]'>
+          <div className='mb-3 lg:mb-6 gap-3 lg:gap-6 grid md:grid-cols-[360px_1fr]'>
             {/* Score Circle */}
             <div className='grid place-items-center bg-white rounded-xl border border-gray-300 p-5 md:p-6'>
               <div className="relative w-fit">
@@ -225,7 +205,7 @@ const ResultsPage = () => {
           </div>
 
           {/* Performance Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 lg:gap-6 mb-10">
             <div className="bg-white rounded-xl border border-gray-300 p-6">
               <div className="flex items-center mb-4">
                 <div className="w-10 h-10 bg-emerald-50 rounded-lg flex items-center justify-center mr-3">
@@ -258,7 +238,7 @@ const ResultsPage = () => {
                 </div>
               </div>
               <div className="text-3xl font-semibold text-gray-900 mb-2">
-                {(timeSpent / totalQuestions).toFixed(1)}s
+                {averageTimeUsed}s
               </div>
               <div className="text-sm text-gray-600">
                 Average time per question
@@ -396,5 +376,3 @@ const ResultsPage = () => {
     </div>
   );
 };
-
-export default ResultsPage;

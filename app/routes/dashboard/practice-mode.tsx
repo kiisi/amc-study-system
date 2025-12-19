@@ -18,8 +18,6 @@ export async function action({
 }: Route.ActionArgs) {
   let formData = await request.formData();
 
-  console.log("Form Data action trigger", formData)
-  
   const intent = formData.get("intent");
 
   if (intent == "submit") {
@@ -28,7 +26,6 @@ export async function action({
 
   return await validateUserAnswer(params.session, formData);
 }
-
 
 export default function PracticeMode({ loaderData }) {
 
