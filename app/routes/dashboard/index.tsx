@@ -20,28 +20,33 @@ import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import NavBar from "~/components/navbar";
 import { destroySession, getSession } from "~/.server/sessions";
+import { loadDashboardInfo } from "./loader";
 
-// export async function loader({
-//   request,
-// }: Route.LoaderArgs) {
-//   const session = await getSession(
-//     request.headers.get("Cookie"),
-//   );
-//   console.log("User ID >" ,session.has("userId"));
-//   if (!session.has("userId")) {
-//     // Redirect to the home page if they are already signed in.
-//     return redirect("/login");
-//   }
+export async function loader({
+  request,
+}: Route.LoaderArgs) {
+  const session = await getSession(
+    request.headers.get("Cookie"),
+  );
+  
+  if (!session.has("userId")) {
+    // Redirect to the home page if they are already signed in.
+    return redirect("/login");
+  }
 
-//   return data(
-//     { success: session.get("userId") },
-//     {
-//       headers: {
-//         "Set-Cookie": await commitSession(session),
-//       },
-//     },
-//   );
-// }
+  const data = await loadDashboardInfo(session.get("userId") as string, session);
+
+  return data;
+
+  // return data(
+  //   { success: session.get("userId") },
+  //   {
+  //     headers: {
+  //       "Set-Cookie": await commitSession(session),
+  //     },
+  //   },
+  // );
+}
 
 export async function action({
   request,
@@ -57,33 +62,10 @@ export async function action({
   });
 }
 
-export default function Dashboard() {
-    // const { user } = useAuth();
-
-  //   const { data: stats, isLoading: statsLoading } = useQuery({
-  //     queryKey: ['/api/stats'],
-  //     queryFn: async () => {
-  //       const response = await fetch('/api/stats', {
-  //         headers: authManager.getAuthHeaders(),
-  //       });
-  //       if (!response.ok) throw new Error('Failed to fetch stats');
-  //       return response.json();
-  //     },
-  //   });
-
-  //   const { data: recentSessions, isLoading: sessionsLoading } = useQuery({
-  //     queryKey: ['/api/sessions'],
-  //     queryFn: async () => {
-  //       const response = await fetch('/api/sessions', {
-  //         headers: authManager.getAuthHeaders(),
-  //       });
-  //       if (!response.ok) throw new Error('Failed to fetch sessions');
-  //       const sessions = await response.json();
-  //       return sessions.slice(0, 3); // Get last 3 sessions
-  //     },
-  //   });
-
-  //   if (!user) return null;
+export default function Dashboard({ loaderData }) {
+  
+  console.log(loaderData)
+  const userData = loaderData.data.user;
 
   return (
     <div>
@@ -94,7 +76,7 @@ export default function Dashboard() {
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-foreground mb-2">
-            Welcome back, Kiisi!
+            Welcome back, {userData.firstName}!
           </h2>
           <p className="text-muted-foreground">Continue your AMC preparation journey. Your next session awaits.</p>
         </div>

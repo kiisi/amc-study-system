@@ -1,4 +1,4 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose, { Schema, Document, Model, Types } from "mongoose";
 import type { IQuestion } from "./question";
 
 export enum SESSION_MODE {
@@ -18,6 +18,7 @@ export interface IQuestionAttempt extends Document {
 }
 
 export interface ISession extends Document {
+    userId: Types.ObjectId,
     mode: SESSION_MODE;
     status: SESSION_STATUS;
     numberOfQuestions: Number;
@@ -47,6 +48,11 @@ const questionAttemptSchema = new Schema<IQuestionAttempt>(
 );
 
 const sessionSchema = new Schema<ISession>({
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: "user",
+        required: true,
+    },
     mode: {
         type: String,                          // ✅ Must specify type
         enum: Object.values(SESSION_MODE),    // ✅ enum applies here

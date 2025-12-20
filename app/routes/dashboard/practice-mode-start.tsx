@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import { error } from "~/components/ui/toast";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { getSession } from "~/.server/sessions";
+import { redirect } from "react-router";
 
 export async function action({
     request,
@@ -14,9 +16,17 @@ export async function action({
 
     formData.append("mode", "practice");
 
-    return await createQuizSession(formData, request);
-}
+    const session = await getSession(
+        request.headers.get("Cookie"),
+    );
 
+    if (!session.has("userId")) {
+        // Redirect to the home page if they are already signed in.
+        return redirect("/login");
+    }
+
+    return await createQuizSession(session.get("userId")!, formData, request);
+}
 
 export default function PracticeModeStart() {
 

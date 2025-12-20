@@ -5,7 +5,7 @@ import { SESSION_STATUS, SessionModel, type IQuestionAttempt, type ISession } fr
 import { formatTime } from "~/utils";
 import { serializeMongoIds } from "~/utils/serialize";
 
-export async function createQuizSession(formData: FormData, request: Request) {
+export async function createQuizSession(userId: string, formData: FormData, request: Request) {
 
     let mode = formData.get("mode") as string;
 
@@ -53,6 +53,7 @@ export async function createQuizSession(formData: FormData, request: Request) {
         }
 
         const session = await SessionModel.create({
+            userId,
             mode,
             numberOfQuestions,
             questionAttempts,
