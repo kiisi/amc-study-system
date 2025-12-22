@@ -15,6 +15,8 @@ export interface IQuestionAttempt extends Document {
     question: IQuestion["_id"]; // reference to the Question
     userAnswer: string; // what the user picked
     isCorrect: boolean; // optional but useful for tracking
+    isBookmarked: boolean;
+    isFlagged: boolean;
 }
 
 export interface ISession extends Document {
@@ -38,6 +40,14 @@ const questionAttemptSchema = new Schema<IQuestionAttempt>(
         userAnswer: {
             type: String,
             required: false,
+        },
+        isBookmarked: {
+            type: Boolean,
+            default: false,
+        },
+        isFlagged: {
+            type: Boolean,
+            default: false,
         },
         isCorrect: {
             type: Boolean,

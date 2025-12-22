@@ -28,7 +28,7 @@ export async function loader({
   const session = await getSession(
     request.headers.get("Cookie"),
   );
-  
+
   if (!session.has("userId")) {
     // Redirect to the home page if they are already signed in.
     return redirect("/login");
@@ -54,7 +54,7 @@ export async function action({
   const session = await getSession(
     request.headers.get("Cookie"),
   );
-  
+
   return redirect("/login", {
     headers: {
       "Set-Cookie": await destroySession(session),
@@ -63,9 +63,15 @@ export async function action({
 }
 
 export default function Dashboard({ loaderData }) {
-  
+
   console.log(loaderData)
-  const userData = loaderData.data.user;
+  const data = loaderData.data;
+
+  const firstName = data.firstName;
+  const sessions = data.sessions;
+  const questionsAttempted = data.questionsAttempted;
+  const overallAccuracy = data.overallAccuracy;
+  const bookmarked = data.bookmarked;
 
   return (
     <div>
@@ -76,7 +82,7 @@ export default function Dashboard({ loaderData }) {
         {/* Welcome Section */}
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-foreground mb-2">
-            Welcome back, {userData.firstName}!
+            Welcome back, {firstName}!
           </h2>
           <p className="text-muted-foreground">Continue your AMC preparation journey. Your next session awaits.</p>
         </div>
@@ -89,8 +95,7 @@ export default function Dashboard({ loaderData }) {
                 <div>
                   <p className="text-sm text-muted-foreground">Questions Attempted</p>
                   <p className="text-2xl font-bold text-foreground" data-testid="stat-questions-attempted">
-                    {/* {statsLoading ? '-' : stats?.totalAttempted || 0} */}
-                    0
+                    {questionsAttempted}
                   </p>
                 </div>
                 <div className="bg-primary/10 p-3 rounded-lg">
@@ -106,8 +111,7 @@ export default function Dashboard({ loaderData }) {
                 <div>
                   <p className="text-sm text-muted-foreground">Overall Accuracy</p>
                   <p className="text-2xl font-bold text-accent" data-testid="stat-accuracy">
-                    0%
-                    {/* {statsLoading ? '-' : `${stats?.overallAccuracy?.toFixed(1) || 0}%`} */}
+                    {overallAccuracy}%
                   </p>
                 </div>
                 <div className="bg-accent/10 p-3 rounded-lg">
@@ -121,9 +125,9 @@ export default function Dashboard({ loaderData }) {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground">Study Sessions</p>
+                  <p className="text-sm text-muted-foreground">Sessions</p>
                   <p className="text-2xl font-bold text-chart-3" data-testid="stat-sessions">
-                    0
+                    {sessions}
                     {/* {statsLoading ? '-' : stats?.sessionCount || 0} */}
                   </p>
                 </div>
@@ -141,7 +145,7 @@ export default function Dashboard({ loaderData }) {
                   <p className="text-sm text-muted-foreground">Bookmarked</p>
                   <p className="text-2xl font-bold text-chart-4" data-testid="stat-bookmarked">
                     {/* {statsLoading ? '-' : stats?.bookmarkCount || 0} */}
-                    0
+                    {bookmarked}
                   </p>
                 </div>
                 <div className="bg-chart-4/10 p-3 rounded-lg">
