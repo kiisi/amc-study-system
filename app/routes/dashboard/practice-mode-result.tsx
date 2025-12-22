@@ -176,7 +176,7 @@ export default function QuizResult({ loaderData }) {
                       <HashIcon className="w-5 h-5 text-gray-500 mr-3" />
                       <span className="text-gray-700">Questions</span>
                     </div>
-                    <span className="font-semibold text-gray-900">{incorrectAnswers}</span>
+                    <span className="font-semibold text-gray-900">{totalQuestions}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center">

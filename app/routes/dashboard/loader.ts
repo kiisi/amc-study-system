@@ -7,7 +7,7 @@ import { SessionModel } from "~/lib/models/session";
 import { UserModel } from "~/lib/models/user";
 import { serializeMongoIds } from "~/utils/serialize";
 
-export async function loadDashboardInfo(userId: string, activeSession: Session): Promise<any>{
+export async function loadDashboardInfo(userId: string, activeSession: Session): Promise<any> {
 
     try {
         const conn = await dbConnect();
@@ -17,13 +17,37 @@ export async function loadDashboardInfo(userId: string, activeSession: Session):
         return data({
             success: false,
             message: 'An error occured while connecting to the server',
-        },{
+        }, {
             status: 200,
         })
     }
 
     try {
-        const session = await SessionModel.findById(userId);
+        const sessions = await SessionModel.find({ userId }).lean();
+
+        let numberOfQuestionsAttempted = 0;
+        let numberOfBookmarkedQuestions = 0;
+        let totalNumberOfQuestions = 0;
+        let totalNumberOfCorrectAnswers = 0;
+
+        sessions.forEach((session) => {
+            totalNumberOfQuestions += session.numberOfQuestions as number;
+
+            totalNumberOfCorrectAnswers += session.questionAttempts.filter(data => data.isCorrect).length;
+
+            session.questionAttempts.forEach((question) => {
+                if (question.userAnswer) {
+                    numberOfQuestionsAttempted += 1;
+                }
+
+                if (question.isBookmarked) {
+                    numberOfBookmarkedQuestions += 1;
+                }
+            })
+        });
+
+        const percentage = (totalNumberOfCorrectAnswers / totalNumberOfQuestions) * 100;
+
         const dbUser = serializeMongoIds(await UserModel.findById(userId).lean());
 
         if (!dbUser) {
@@ -36,25 +60,21 @@ export async function loadDashboardInfo(userId: string, activeSession: Session):
 
         const { password, ...user } = dbUser;
 
-        if (!session) {
-            return data({
-                success: false,
-                message: "Dashboard info loaded",
-                data: {
-                    user,
-                }
-            }, {
-                status: 200,
-            });
-        }
-
         return data({
             success: true,
             messsage: "Dashboard data loaded",
             data: {
+                firstName: user.firstName,
+                sessions: sessions.length,
+                questionsAttempted: numberOfQuestionsAttempted,
+                overallAccuracy: percentage,
+                bookmarked: numberOfBookmarkedQuestions,
             }
         }, {
             status: 200,
+            headers: {
+                "Content-Type": "application/json",
+            }
         })
     }
     catch (error) {
