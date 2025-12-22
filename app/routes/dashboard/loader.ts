@@ -67,7 +67,7 @@ export async function loadDashboardInfo(userId: string, activeSession: Session):
                 firstName: user.firstName,
                 sessions: sessions.length,
                 questionsAttempted: numberOfQuestionsAttempted,
-                overallAccuracy: percentage,
+                overallAccuracy: Math.round(percentage),
                 bookmarked: numberOfBookmarkedQuestions,
             }
         }, {
