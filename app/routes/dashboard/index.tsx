@@ -176,15 +176,15 @@ export default function Dashboard({ loaderData }) {
               </p>
               <div className="space-y-3 mb-6">
                 <div className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-2 h-2 bg-accent rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
                   <span>Immediate answer feedback</span>
                 </div>
                 <div className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-2 h-2 bg-accent rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
                   <span>Detailed explanations</span>
                 </div>
                 <div className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-2 h-2 bg-accent rounded-full mr-3"></div>
+                  <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
                   <span>Adaptive question selection</span>
                 </div>
               </div>

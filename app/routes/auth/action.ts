@@ -44,7 +44,7 @@ export async function loginAccount(formData: FormData, request: Request) {
         if (!isExistingUser) {
             return {
                 status: "error",
-                message: 'This account does not exists.',
+                message: 'Invalid credentials.',
             }
         }
 
@@ -143,7 +143,7 @@ export async function registerAccount(formData: FormData, request: Request) {
         if (isExistingUser) {
             return {
                 status: "error",
-                message: 'An account with this email already exists.',
+                message: 'Unable to create account with the provided credentials.',
             }
         }
 

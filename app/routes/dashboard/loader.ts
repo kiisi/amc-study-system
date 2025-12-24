@@ -46,8 +46,8 @@ export async function loadDashboardInfo(userId: string, activeSession: Session):
             })
         });
 
-        const percentage = (totalNumberOfCorrectAnswers / totalNumberOfQuestions) * 100;
-
+        const percentage = totalNumberOfQuestions == 0 ? 0 : (totalNumberOfCorrectAnswers / totalNumberOfQuestions) * 100;
+        
         const dbUser = serializeMongoIds(await UserModel.findById(userId).lean());
 
         if (!dbUser) {
@@ -67,7 +67,7 @@ export async function loadDashboardInfo(userId: string, activeSession: Session):
                 firstName: user.firstName,
                 sessions: sessions.length,
                 questionsAttempted: numberOfQuestionsAttempted,
-                overallAccuracy: percentage,
+                overallAccuracy: Math.round(percentage),
                 bookmarked: numberOfBookmarkedQuestions,
             }
         }, {
