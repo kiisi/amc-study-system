@@ -44,6 +44,8 @@ export default function Login() {
 
     const actionData = fetcher.data
 
+    console.log(actionData)
+
     return (
         <main className="min-h-screen bg-[#f4f5f6] grid place-items-center px-4 py-10">
             <div className="w-full max-w-[526px]">

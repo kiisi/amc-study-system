@@ -305,7 +305,7 @@ export async function practiceModeQuizResult(sessionId: string) {
 
         const totalQuestions = session.numberOfQuestions as number;
 
-        const percentage = (correctAnswers / totalQuestions) * 100;
+        const percentage = Math.round((correctAnswers / totalQuestions) * 100);
 
         const start = new Date(session.createdAt).getTime();
 
