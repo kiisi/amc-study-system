@@ -22,9 +22,8 @@ interface QuestionCardProps {
   userAnswer?: string;
   showFeedback?: boolean;
   isBookmarked?: boolean;
+  isFlagged?: boolean;
   onAnswerSelect?: (index: number) => void;
-  onBookmark?: () => void;
-  onFlag?: () => void;
 }
 
 export default function QuestionCard({
@@ -38,6 +37,8 @@ export default function QuestionCard({
   correctAnswer,
   explanation,
   userAnswer,
+  isBookmarked,
+  isFlagged,
 }: QuestionCardProps) {
 
   const navigation = useNavigation();
@@ -45,6 +46,8 @@ export default function QuestionCard({
   const navigate = useNavigate();
 
   const fetcher = useFetcher();
+
+  console.log(fetcher)
 
   const isNavigating = Boolean(navigation.location);
 
@@ -65,6 +68,20 @@ export default function QuestionCard({
     fetcher.submit(
       { questionId, userAnswer: value },
       { method: "post" }
+    );
+  };
+
+  const bookmarkQuestionHandler = () => {
+    fetcher.submit(
+      { questionId, intent: "bookmark" },
+      { method: "patch" }
+    );
+  };
+
+  const flagQuestionHandler = () => {
+    fetcher.submit(
+      { questionId, intent: "flag" },
+      { method: "patch" }
     );
   };
 
@@ -102,18 +119,20 @@ export default function QuestionCard({
               <Button
                 size="icon"
                 variant="ghost"
-                onClick={() => { }}
+                onClick={bookmarkQuestionHandler}
                 data-testid="button-bookmark"
+                className="hover:text-primary"
               >
-                <Bookmark className={`w-5 h-5 ${false ? 'fill-primary text-primary' : ''}`} />
+                <Bookmark className={cn("w-5 h-5", isBookmarked ? 'fill-primary text-primary stroke-primary' : '')} />
               </Button>
               <Button
                 size="icon"
                 variant="ghost"
-                onClick={() => { }}
+                onClick={flagQuestionHandler}
                 data-testid="button-flag"
+                className="hover:text-red-500"
               >
-                <Flag className="w-5 h-5" />
+                <Flag className={cn("w-5 h-5", isFlagged ? "fill-red-500 stroke-red-500" : "")} />
               </Button>
             </div>
           </div>
