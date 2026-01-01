@@ -14,10 +14,13 @@ export async function createQuizSession(userId: string, formData: FormData, requ
     }
     catch (error) {
         console.log(error)
-        return {
-            status: "error",
-            message: 'An error occured while connecting to the server',
-        }
+
+        return data({
+            error: true,
+            message: "An error occured while connecting to the server",
+        }, {
+            status: 500,
+        });
     }
 
     let numberOfQuestions = formData.get("numberOfQuestions") as string;
