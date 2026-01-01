@@ -1,5 +1,5 @@
 import QuestionCard from "~/components/cards/question-card";
-import { loadQuizQuestion, submitPracticeModeQuiz, validateUserAnswer } from "./action";
+import { bookmarkQuizQuestion, flagQuizQuestion, loadQuizQuestion, submitPracticeModeQuiz, validateUserAnswer } from "./action";
 import { useSearchParams } from "react-router";
 
 
@@ -20,8 +20,16 @@ export async function action({
 
   const intent = formData.get("intent");
 
+  if (intent == "flag") {
+    return await flagQuizQuestion(params.session, formData);
+  }
+
+  if (intent == "bookmark") {
+    return await bookmarkQuizQuestion(params.session, formData);
+  }
+
   if (intent == "submit") {
-    return await submitPracticeModeQuiz(params.session, formData);
+    return await submitPracticeModeQuiz(params.session);
   }
 
   return await validateUserAnswer(params.session, formData);
@@ -58,6 +66,8 @@ export default function PracticeMode({ loaderData }) {
           correctAnswer={question.correctAnswer}
           explanation={question.explanation}
           userAnswer={sessionQuestions.userAnswer}
+          isFlagged={sessionQuestions.isFlagged}
+          isBookmarked={sessionQuestions.isBookmarked}
         />
       </div>
     </div>

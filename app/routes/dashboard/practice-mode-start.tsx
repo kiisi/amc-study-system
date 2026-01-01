@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowLeft, ArrowRight, Loader2, X } from "lucide-react";
+import { AlertTriangle, ArrowLeft, ArrowRight, CircleAlert, Loader2, X } from "lucide-react";
 import { useActionData, useFetcher, useNavigate } from "react-router";
 import { Button } from "~/components/ui/button";
 import { createQuizSession } from "./action";
@@ -34,6 +34,8 @@ export default function PracticeModeStart() {
 
     let fetcher = useFetcher();
 
+    const fetcherData = fetcher.data
+
     const [showConfirm, setShowConfirm] = useState(false);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -41,29 +43,6 @@ export default function PracticeModeStart() {
     const handleExit = () => {
         navigate('/dashboard')
     }
-
-    // useEffect(() => {
-    //     console.log(fetcher)
-    //     if(fetcher?.data?.status === "error"){
-    //         error(fetcher.data.message);
-    //     }
-    // }, [fetcher?.data?.status])
-
-    // if(fetcher?.data?.status === "error"){
-    //         error(fetcher.data.message);
-    // }
-
-    // useEffect(() => {
-    //     if (!actionData) return;
-
-    //     if (actionData.error) {
-    //         toast.error(actionData.message);
-    //     }
-
-    //     if (actionData.success) {
-    //         toast.success(actionData.message);
-    //     }
-    // }, [actionData]);
 
     return (
         <>
@@ -85,7 +64,19 @@ export default function PracticeModeStart() {
                             placeholder="Min of 25 and Max of 150"
                         />
                     </div>
-
+                    {
+                        fetcherData?.error && (
+                            <div className="flex gap-2 min-h-[60px] w-full rounded-[8px] border-red border-1 p-2">
+                                <div className="pt-[2px]">
+                                    <CircleAlert className="h-5 w-5 text-red" />
+                                </div>
+                                <div>
+                                    <h2 className="text-red font-medium text-[14.5px]">Error!</h2>
+                                    <p className="text-red text-[13.5px]">{fetcherData.message}</p>
+                                </div>
+                            </div>
+                        )
+                    }
                     <div className="flex sm:items-center gap-2 sm:gap-4 justify-between flex-row-reverse">
                         <Button
                             type="submit"

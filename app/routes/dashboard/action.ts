@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { data, redirect } from "react-router";
 import dbConnect from "~/.server/db";
 import { QuestionModel } from "~/lib/models/question";
@@ -14,10 +15,13 @@ export async function createQuizSession(userId: string, formData: FormData, requ
     }
     catch (error) {
         console.log(error)
-        return {
-            status: "error",
-            message: 'An error occured while connecting to the server',
-        }
+
+        return data({
+            error: true,
+            message: "An error occured while connecting to the server",
+        }, {
+            status: 500,
+        });
     }
 
     let numberOfQuestions = formData.get("numberOfQuestions") as string;
@@ -106,7 +110,7 @@ export async function loadQuizQuestion(sessionId: string, page: string | null) {
         if (questionAttemptPage[0]?.userAnswer) {
             const payload = {
                 mode: sessionQuestions.mode,
-                ...(serializeMongoIds(questionAttemptPage[0])),
+                ...questionAttemptPage[0],
                 numberOfQuestions: sessionQuestions.numberOfQuestions,
             }
 
@@ -119,10 +123,11 @@ export async function loadQuizQuestion(sessionId: string, page: string | null) {
             });
         }
 
-        const questionWithoutAnswer = serializeMongoIds(questionAttemptPage[0]);
+        const questionWithoutAnswer = questionAttemptPage[0];
 
         const payload = {
             mode: sessionQuestions.mode,
+            numberOfQuestions: sessionQuestions.numberOfQuestions,
             ...questionWithoutAnswer,
             question: {
                 ...questionWithoutAnswer.question,
@@ -130,10 +135,9 @@ export async function loadQuizQuestion(sessionId: string, page: string | null) {
                 explanation: undefined,
 
             },
-            numberOfQuestions: sessionQuestions.numberOfQuestions,
         }
 
-        return data<any>({
+        return Response.json({
             success: true,
             message: "Question loaded successfully",
             data: payload,
@@ -263,6 +267,205 @@ export async function submitPracticeModeQuiz(sessionId: string) {
     }
 }
 
+export async function bookmarkQuizQuestion(sessionId: string, formData) {
+
+    const questionId = formData.get("questionId") as string;
+
+    if (!sessionId) {
+        return data({
+            success: true,
+            message: "Session ID not found",
+        }, {
+            status: 404,
+        });
+    }
+
+    try {
+        const conn = await dbConnect();
+    }
+    catch (error) {
+        console.log(error)
+        return {
+            status: "error",
+            message: 'An error occured while connecting to the server',
+        }
+    }
+
+    try {
+        const session = await SessionModel.findById(sessionId);
+
+        if (!session) {
+            return data({
+                success: false,
+                message: "Session not found"
+            }, {
+                status: 400,
+            });
+        }
+
+        // 2️⃣ Check if it has already ended
+        if (session.completedAt) {
+            return data({
+                success: true,
+                message: "Quiz has already ended ✅"
+            }, {
+                status: 200,
+            })
+        }
+
+        await SessionModel.updateOne(
+            { _id: sessionId },
+            [
+                {
+                    $set: {
+                        questionAttempts: {
+                            $map: {
+                                input: "$questionAttempts",
+                                as: "q",
+                                in: {
+                                    $cond: [
+                                        {
+                                            $eq: [
+                                                "$$q.question",
+                                                new mongoose.Types.ObjectId(questionId),
+                                            ],
+                                        },
+                                        {
+                                            $mergeObjects: [
+                                                "$$q",
+                                                {
+                                                    isBookmarked: {
+                                                        $not: "$$q.isBookmarked",
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                        "$$q",
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                },
+            ]
+        );
+
+        return Response.json({
+            message: "Bookmarked I handle everything else",
+            data: session,
+        });
+    }
+    catch (error) {
+        console.log(error)
+        return data({
+            status: "error",
+            message: 'An error occured',
+        }, {
+            status: 400
+        })
+    }
+}
+
+
+export async function flagQuizQuestion(sessionId: string, formData) {
+
+    const questionId = formData.get("questionId") as string;
+
+    if (!sessionId) {
+        return data({
+            success: true,
+            message: "Session ID not found",
+        }, {
+            status: 404,
+        });
+    }
+
+    try {
+        const conn = await dbConnect();
+    }
+    catch (error) {
+        console.log(error)
+        return {
+            status: "error",
+            message: 'An error occured while connecting to the server',
+        }
+    }
+
+    try {
+        const session = await SessionModel.findById(sessionId);
+
+        if (!session) {
+            return data({
+                success: false,
+                message: "Session not found"
+            }, {
+                status: 400,
+            });
+        }
+
+        // 2️⃣ Check if it has already ended
+        if (session.completedAt) {
+            return data({
+                success: true,
+                message: "Quiz has already ended ✅"
+            }, {
+                status: 200,
+            })
+        }
+
+        await SessionModel.updateOne(
+            { _id: sessionId },
+            [
+                {
+                    $set: {
+                        questionAttempts: {
+                            $map: {
+                                input: "$questionAttempts",
+                                as: "q",
+                                in: {
+                                    $cond: [
+                                        {
+                                            $eq: [
+                                                "$$q.question",
+                                                new mongoose.Types.ObjectId(questionId),
+                                            ],
+                                        },
+                                        {
+                                            $mergeObjects: [
+                                                "$$q",
+                                                {
+                                                    isFlagged: {
+                                                        $not: "$$q.isFlagged",
+                                                    },
+                                                },
+                                            ],
+                                        },
+                                        "$$q",
+                                    ],
+                                },
+                            },
+                        },
+                    },
+                },
+            ]
+        );
+
+        return Response.json({
+            message: "Flagged I handle everything else",
+            data: session,
+        });
+    }
+    catch (error) {
+        console.log(error)
+        return data({
+            status: "error",
+            message: 'An error occured',
+        }, {
+            status: 400
+        })
+    }
+}
+
 export async function practiceModeQuizResult(sessionId: string) {
 
     if (!sessionId) {
@@ -315,7 +518,7 @@ export async function practiceModeQuizResult(sessionId: string) {
 
         const attemptedQuestions = totalQuestions - unAttemptedQuestions
 
-        const averageTimeUsed = attemptedQuestions > 0 ? (timeUsedMs / 1000) / attemptedQuestions : 0; 
+        const averageTimeUsed = attemptedQuestions > 0 ? (timeUsedMs / 1000) / attemptedQuestions : 0;
 
         return data({
             success: true,
