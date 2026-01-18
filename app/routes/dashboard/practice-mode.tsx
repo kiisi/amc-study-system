@@ -1,6 +1,7 @@
 import QuestionCard from "~/components/cards/question-card";
-import { bookmarkQuizQuestion, flagQuizQuestion, loadQuizQuestion, submitPracticeModeQuiz, validateUserAnswer } from "./action";
+import { bookmarkQuizQuestion, flagQuizQuestion, submitPracticeModeQuiz, validateUserAnswer } from "./action";
 import { useSearchParams } from "react-router";
+import { loadQuizQuestion } from "./loader";
 
 
 export async function loader({ params, request }: Route.LoaderArgs) {

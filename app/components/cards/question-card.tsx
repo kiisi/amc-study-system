@@ -121,7 +121,7 @@ export default function QuestionCard({
                 variant="ghost"
                 onClick={bookmarkQuestionHandler}
                 data-testid="button-bookmark"
-                className="hover:text-primary"
+                className="hover:bg-black/10 hover:text-primary"
               >
                 <Bookmark className={cn("w-5 h-5", isBookmarked ? 'fill-primary text-primary stroke-primary' : '')} />
               </Button>
@@ -130,7 +130,7 @@ export default function QuestionCard({
                 variant="ghost"
                 onClick={flagQuestionHandler}
                 data-testid="button-flag"
-                className="hover:text-red-500"
+                className="hover:bg-black/10 hover:text-red-500"
               >
                 <Flag className={cn("w-5 h-5", isFlagged ? "fill-red-500 stroke-red-500" : "")} />
               </Button>
@@ -248,8 +248,9 @@ export default function QuestionCard({
             data-testid="button-next"
             onClick={() => setSearchParams({ page: String(questionNumber + 1) })}
             isLoading={isNavigating}
+            disabled={isNavigating}
             className="min-w-[125px]"
-            // type="button"
+            type="button"
           >
             Continue
             <ArrowRight className="w-4 h-4 ml-2" />
@@ -260,6 +261,7 @@ export default function QuestionCard({
           <Button
             data-testid="button-next"
             isLoading={isNavigating}
+            disabled={isNavigating}
             className="min-w-[125px]"
             type="submit"
             onClick={handleSubmit}

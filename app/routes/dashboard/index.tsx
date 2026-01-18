@@ -1,9 +1,4 @@
 import { data, Link, redirect } from "react-router";
-// import { useQuery } from "@tanstack/react-query";
-// import { useAuth } from "@/hooks/use-auth";
-// import { Button } from "@/components/ui/button";
-// import { Card, CardContent } from "@/components/ui/card";
-// import { authManager } from "@/lib/auth";
 import {
   Brain,
   Clock,
@@ -14,13 +9,19 @@ import {
   Target,
   Calendar,
   Timer,
-  GraduationCap
+  GraduationCap,
+  Activity
 } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import NavBar from "~/components/navbar";
 import { destroySession, getSession } from "~/.server/sessions";
 import { loadDashboardInfo } from "./loader";
+import type { ApexOptions } from "apexcharts";
+import { lazy, Suspense, useEffect, useState } from "react";
+import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { cn } from '~/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export async function loader({
   request,
@@ -37,15 +38,6 @@ export async function loader({
   const data = await loadDashboardInfo(session.get("userId") as string, session);
 
   return data;
-
-  // return data(
-  //   { success: session.get("userId") },
-  //   {
-  //     headers: {
-  //       "Set-Cookie": await commitSession(session),
-  //     },
-  //   },
-  // );
 }
 
 export async function action({
@@ -64,7 +56,6 @@ export async function action({
 
 export default function Dashboard({ loaderData }) {
 
-  console.log(loaderData)
   const data = loaderData.data;
 
   const firstName = data.firstName;
@@ -72,6 +63,8 @@ export default function Dashboard({ loaderData }) {
   const questionsAttempted = data.questionsAttempted;
   const overallAccuracy = data.overallAccuracy;
   const bookmarked = data.bookmarked;
+
+
 
   return (
     <div>
@@ -226,7 +219,7 @@ export default function Dashboard({ loaderData }) {
                   <span>Comprehensive analysis</span>
                 </div>
               </div>
-              <Link to="/exam" className="mt-auto">
+              <Link to="/exam-mode-start" className="mt-auto">
                 <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90" data-testid="button-start-exam">
                   Start Exam Simulation
                 </Button>
@@ -234,6 +227,9 @@ export default function Dashboard({ loaderData }) {
             </CardContent>
           </Card>
         </div>
+
+        {/* Analytical Charts */}
+        <QuizAnalytics />
 
         {/* Additional Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -347,3 +343,197 @@ export default function Dashboard({ loaderData }) {
     </div>
   );
 }
+
+
+const QuizAnalytics: React.FC = () => {
+
+  const [timeRange, setTimeRange] = useState('24h');
+
+  // Active Tunnels data
+  const tunnelData = [
+    { time: '2 pm', value: 14 },
+    { time: '3 pm', value: 12 },
+    { time: '4 pm', value: 16 },
+    { time: '5 pm', value: 11 },
+    { time: '6 pm', value: 18 },
+    { time: '7 pm', value: 22 },
+    { time: '8 pm', value: 24 },
+    { time: '9 pm', value: 21 },
+    { time: '10 pm', value: 28 },
+    { time: '11 pm', value: 32 },
+    { time: '12 am', value: 18 },
+    { time: '1 am', value: 14 },
+    { time: '2 am', value: 9 },
+    { time: '3 am', value: 12 },
+    { time: '4 am', value: 8 },
+    { time: '5 am', value: 11 },
+    { time: '6 am', value: 14 },
+    { time: '7 am', value: 16 },
+    { time: '8 am', value: 19 },
+    { time: '9 am', value: 15 },
+    { time: '10 am', value: 18 },
+    { time: '11 am', value: 22 },
+    { time: '12 pm', value: 26 },
+    { time: '1 pm', value: 24 }
+  ];
+
+  // Plan Distribution data
+  const planData = [
+    { name: 'Free', value: 516, color: '#6B7280' },
+    { name: 'Ray', value: 0, color: '#3B82F6' },
+    { name: 'Beam', value: 1, color: '#8B5CF6' },
+    { name: 'Pulse', value: 0, color: '#F97316' }
+  ];
+
+  const ranges = ['24h', '7d', '30d'];
+
+  const activeIndex = ranges.indexOf(timeRange);
+
+  const attemptData = [
+    { name: "Correct Answers", value: 312 },
+    { name: "Incorrect Answers", value: 128 },
+    { name: "Bookmarked", value: 56 },
+    { name: "Flagged", value: 22 }
+  ];
+
+  const PRIMARY = "hsl(221.2, 83.2%, 53.3%)";
+
+  const COLORS = ["#9ca3af", PRIMARY, "#a855f7", "#f59e0b"];
+
+  return (
+    // <Suspense fallback={<div className="mb-8 h-[400px]">Loading chart...</div>}>
+    //   <div className="grid lg:grid-cols-2 gap-8 space-y-10 mb-2">
+    //     <div className="rounded-lg border border-[#e2e8f0] h-full max-h-[400px] pt-5 bg-card text-card-foreground">
+    //       <Chart
+    //         options={areaChartOptions}
+    //         series={areaChartSeries}
+    //         type="area"
+    //         className="h-full"
+    //       />
+    //     </div>
+    //     <div className="rounded-lg border h-full max-h-[400px] border-[#e2e8f0] pt-5 bg-card text-card-foreground">
+    //       <Chart
+    //         options={barChartOptions}
+    //         series={barChartSeries}
+    //         type="bar"
+    //         className="h-full"
+    //       />
+    //     </div>
+    //   </div>
+    // </Suspense>
+    <div className="grid lg:grid-cols-3 gap-8 mb-8">
+      {/* Active Tunnels Chart */}
+      <div className="lg:col-span-2 bg-white border border-zinc-200 rounded-xl py-6">
+        <div className="flex items-center justify-between mb-6 px-6">
+          <div>
+            <div className="flex items-center gap-2 mb-2">
+              <Activity className="text-amber-500" size={20} />
+              <h2 className="text-xl font-semibold">Quiz attempts</h2>
+            </div>
+            <p className="text-zinc-400 text-sm">Attempt trends across time</p>
+          </div>
+          <AnimatePresence>
+            <div className="p-[4px] flex gap-2 bg-[#F2F4F7] rounded-[12px] relative">
+              <motion.div
+                layoutId="active-pill"
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                animate={{ x: activeIndex * 48 }}
+                className="absolute z-2 top-[4px] left-[4px] h-[32px] w-[40px] bg-white rounded-[8px]"
+              />
+              {ranges.map((range) => (
+                <button
+                  key={range}
+                  onClick={() => setTimeRange(range)}
+                  className={cn("cursor-pointer relative z-4 h-[32px] w-[40px] text-[14px] px-2 rounded-[8px]", timeRange === range
+                    ? '-bg-white text-primary'
+                    : 'text-[#475569]')}
+                >
+                  {range}
+                </button>
+              ))}
+            </div>
+          </AnimatePresence>
+        </div>
+
+        <ResponsiveContainer width="100%" height={400} className="pr-5">
+          <AreaChart data={tunnelData}>
+            <defs>
+              <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <XAxis
+              dataKey="time"
+              stroke="#52525b"
+              tick={{ fill: '#71717a' }}
+            />
+            <YAxis
+              stroke="#52525b"
+              tick={{ fill: '#71717a' }}
+            />
+            <Tooltip
+              contentStyle={{
+                border: '1px solid #f1f2f3',
+                borderRadius: '6px'
+              }}
+            />
+            <Area
+              type="monotone"
+              dataKey="value"
+              stroke="#2563eb"
+              strokeWidth={2}
+              fill="url(#colorValue)"
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+
+      {/* Donut Chart */}
+      <div className="rounded-2xl bg-white border border-zinc-200 p-6">
+        <h3 className="font-semibold mb-1">Question Attempts Overview</h3>
+        <p className="text-sm text-zinc-500 mb-4">Distribution of user interactions per session</p>
+        <div className="h-72 flex items-center justify-center">
+          <PieChart width={220} height={220}>
+            <Pie
+              data={attemptData}
+              innerRadius={70}
+              outerRadius={100}
+              paddingAngle={2}
+              dataKey="value"
+              stroke="#e5e7eb"
+              strokeWidth={1}
+            >
+              {attemptData.map((entry, i) => (
+                <Cell
+                  key={i}
+                  fill={COLORS[i]}
+                  fillOpacity={entry.value === 0 ? 0.25 : 1}
+                />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: 8,
+                color: "#111827"
+              }}
+            />
+          </PieChart>
+        </div>
+        <ul className="space-y-2 text-sm">
+          {attemptData.map((p, i) => (
+            <li key={p.name} className="flex justify-between text-zinc-600">
+              <span className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full" style={{ background: COLORS[i] }} />
+                {p.name}
+              </span>
+              <span className="font-medium">{p.value}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  );
+};
