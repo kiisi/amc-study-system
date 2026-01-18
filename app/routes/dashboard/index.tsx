@@ -389,6 +389,17 @@ const QuizAnalytics: React.FC = () => {
 
   const activeIndex = ranges.indexOf(timeRange);
 
+  const attemptData = [
+    { name: "Correct Answers", value: 312 },
+    { name: "Incorrect Answers", value: 128 },
+    { name: "Bookmarked", value: 56 },
+    { name: "Flagged", value: 22 }
+  ];
+
+  const PRIMARY = "hsl(221.2, 83.2%, 53.3%)";
+
+  const COLORS = ["#9ca3af", PRIMARY, "#a855f7", "#f59e0b"];
+
   return (
     // <Suspense fallback={<div className="mb-8 h-[400px]">Loading chart...</div>}>
     //   <div className="grid lg:grid-cols-2 gap-8 space-y-10 mb-2">
@@ -444,7 +455,7 @@ const QuizAnalytics: React.FC = () => {
           </AnimatePresence>
         </div>
 
-        <ResponsiveContainer width="100%" height={400} className="pr-6">
+        <ResponsiveContainer width="100%" height={400} className="pr-5">
           <AreaChart data={tunnelData}>
             <defs>
               <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
@@ -478,63 +489,50 @@ const QuizAnalytics: React.FC = () => {
         </ResponsiveContainer>
       </div>
 
-      {/* Plan Distribution Chart */}
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-        <div className="mb-6">
-          <h2 className="text-xl font-semibold mb-2">Plan Distribution</h2>
-          <p className="text-zinc-400 text-sm">518 organizations by plan</p>
+      {/* Donut Chart */}
+      <div className="rounded-2xl bg-white border border-zinc-200 p-6">
+        <h3 className="font-semibold mb-1">Question Attempts Overview</h3>
+        <p className="text-sm text-zinc-500 mb-4">Distribution of user interactions per session</p>
+        <div className="h-72 flex items-center justify-center">
+          <PieChart width={220} height={220}>
+            <Pie
+              data={attemptData}
+              innerRadius={70}
+              outerRadius={100}
+              paddingAngle={2}
+              dataKey="value"
+              stroke="#e5e7eb"
+              strokeWidth={1}
+            >
+              {attemptData.map((entry, i) => (
+                <Cell
+                  key={i}
+                  fill={COLORS[i]}
+                  fillOpacity={entry.value === 0 ? 0.25 : 1}
+                />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{
+                backgroundColor: "#ffffff",
+                border: "1px solid #e5e7eb",
+                borderRadius: 8,
+                color: "#111827"
+              }}
+            />
+          </PieChart>
         </div>
-
-        <div className="flex items-center justify-center mb-6">
-          <div className="relative">
-            <svg width="200" height="200" viewBox="0 0 200 200">
-              <circle
-                cx="100"
-                cy="100"
-                r="80"
-                fill="none"
-                stroke="#3f3f46"
-                strokeWidth="30"
-              />
-              <circle
-                cx="100"
-                cy="100"
-                r="80"
-                fill="none"
-                stroke="#6B7280"
-                strokeWidth="30"
-                strokeDasharray={`${(516 / 518) * 502.65} 502.65`}
-                transform="rotate(-90 100 100)"
-              />
-              <circle
-                cx="100"
-                cy="100"
-                r="80"
-                fill="none"
-                stroke="#8B5CF6"
-                strokeWidth="30"
-                strokeDasharray={`${(1 / 518) * 502.65} 502.65`}
-                strokeDashoffset={`-${(516 / 518) * 502.65}`}
-                transform="rotate(-90 100 100)"
-              />
-            </svg>
-          </div>
-        </div>
-
-        <div className="space-y-3">
-          {planData.map((plan, index) => (
-            <div key={index} className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div
-                  className="w-3 h-3 rounded-full"
-                  style={{ backgroundColor: plan.color }}
-                ></div>
-                <span className="text-zinc-300">{plan.name}</span>
-              </div>
-              <span className="font-semibold">{plan.value}</span>
-            </div>
+        <ul className="space-y-2 text-sm">
+          {attemptData.map((p, i) => (
+            <li key={p.name} className="flex justify-between text-zinc-600">
+              <span className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full" style={{ background: COLORS[i] }} />
+                {p.name}
+              </span>
+              <span className="font-medium">{p.value}</span>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </div>
   );
