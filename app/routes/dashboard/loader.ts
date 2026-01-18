@@ -87,3 +87,150 @@ export async function loadDashboardInfo(userId: string, activeSession: Session):
         })
     }
 }
+
+// PRACTICE MODE
+export async function loadQuizQuestion(sessionId: string, page: string | null) {
+    try {
+        const conn = await dbConnect();
+    }
+    catch (error) {
+        console.log(error)
+        return {
+            status: "error",
+            message: 'An error occured while connecting to the server',
+        }
+    }
+
+    try {
+        const pageNumber = Number(page ?? 1); // e.g. ?page=2
+        const limit = 1;
+        const skip = (pageNumber - 1) * limit;
+
+        const sessionQuestions = await SessionModel.findById(sessionId)
+            .populate({
+                path: "questionAttempts.question",
+                populate: { path: "subject" }
+            })
+            .lean();
+
+        if (!sessionQuestions) return data<any>({
+            error: true,
+            message: "This page is not available",
+        }, {
+            status: 400,
+        });;
+
+        // 2️⃣ Pick the questionAttempts slice for this page
+        const questionAttemptPage = sessionQuestions.questionAttempts.slice(skip, skip + limit);
+
+        if (questionAttemptPage[0]?.userAnswer) {
+            const payload = {
+                mode: sessionQuestions.mode,
+                ...questionAttemptPage[0],
+                numberOfQuestions: sessionQuestions.numberOfQuestions,
+            }
+
+            return data<any>({
+                success: true,
+                message: "Question loaded successfully",
+                data: payload,
+            }, {
+                status: 200,
+            });
+        }
+
+        const questionWithoutAnswer = questionAttemptPage[0];
+
+        const payload = {
+            mode: sessionQuestions.mode,
+            numberOfQuestions: sessionQuestions.numberOfQuestions,
+            ...questionWithoutAnswer,
+            question: {
+                ...questionWithoutAnswer.question,
+                correctAnswer: undefined,
+                explanation: undefined,
+
+            },
+        }
+
+        return Response.json({
+            success: true,
+            message: "Question loaded successfully",
+            data: payload,
+        }, {
+            status: 200,
+        });
+    }
+    catch (error) {
+        return {
+            status: "error",
+            message: 'An error occured',
+        }
+    }
+}
+
+// EXAM MODE
+export async function loadExamQuizQuestion(sessionId: string, page: string | null) {
+    try {
+        const conn = await dbConnect();
+    }
+    catch (error) {
+        console.log(error)
+        return {
+            status: "error",
+            message: 'An error occured while connecting to the server',
+        }
+    }
+
+    try {
+        const pageNumber = Number(page ?? 1); // e.g. ?page=2
+        const limit = 1;
+        const skip = (pageNumber - 1) * limit;
+
+        const sessionQuestions = await SessionModel.findById(sessionId)
+            .populate({
+                path: "questionAttempts.question",
+                populate: { path: "subject" }
+            })
+            .lean();
+
+        if (!sessionQuestions) return data<any>({
+            error: true,
+            message: "This page is not available",
+        }, {
+            status: 400,
+        });;
+
+        // 2️⃣ Pick the questionAttempts slice for this page
+        const questionAttemptPage = sessionQuestions.questionAttempts.slice(skip, skip + limit);
+
+        const questionWithoutAnswer = questionAttemptPage[0];
+
+        const payload = {
+            mode: sessionQuestions.mode,
+            numberOfQuestions: sessionQuestions.numberOfQuestions,
+            ...questionWithoutAnswer,
+            isCorrect: undefined,
+            question: {
+                ...questionWithoutAnswer.question,
+                correctAnswer: undefined,
+                explanation: undefined,
+
+            },
+        }
+
+        return Response.json({
+            success: true,
+            message: "Question loaded successfully",
+            data: payload,
+        }, {
+            status: 200,
+        });
+    }
+    catch (error) {
+        return {
+            status: "error",
+            message: 'An error occured',
+        }
+    }
+}
