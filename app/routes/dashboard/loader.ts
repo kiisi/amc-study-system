@@ -23,31 +23,6 @@ export async function loadDashboardInfo(userId: string, activeSession: Session):
     }
 
     try {
-        const sessions = await SessionModel.find({ userId }).lean();
-
-        let numberOfQuestionsAttempted = 0;
-        let numberOfBookmarkedQuestions = 0;
-        let totalNumberOfQuestions = 0;
-        let totalNumberOfCorrectAnswers = 0;
-
-        sessions.forEach((session) => {
-            totalNumberOfQuestions += session.numberOfQuestions as number;
-
-            totalNumberOfCorrectAnswers += session.questionAttempts.filter(data => data.isCorrect).length;
-
-            session.questionAttempts.forEach((question) => {
-                if (question.userAnswer) {
-                    numberOfQuestionsAttempted += 1;
-                }
-
-                if (question.isBookmarked) {
-                    numberOfBookmarkedQuestions += 1;
-                }
-            })
-        });
-
-        const percentage = totalNumberOfQuestions == 0 ? 0 : (totalNumberOfCorrectAnswers / totalNumberOfQuestions) * 100;
-        
         const dbUser = serializeMongoIds(await UserModel.findById(userId).lean());
 
         if (!dbUser) {
@@ -57,6 +32,66 @@ export async function loadDashboardInfo(userId: string, activeSession: Session):
                 },
             });
         }
+
+        const sessions = await SessionModel.find({ userId }).lean();
+
+        let numberOfQuestionsAttempted = 0;
+        let numberOfBookmarkedQuestions = 0;
+        let numberOfFlaggedQuestions = 0;
+        let totalNumberOfQuestions = 0;
+        let totalNumberOfCorrectAnswers = 0;
+        let totalNumberOfIncorrectAnswers = 0;
+
+        // Group attempts by ISO date for chronological sorting
+        const attemptsByDate: Record<string, number> = {};
+
+        sessions.forEach((session) => {
+            totalNumberOfQuestions += session.numberOfQuestions as number;
+
+            totalNumberOfCorrectAnswers += session.questionAttempts.filter(data => data.isCorrect).length;
+
+            // ISO date key (YYYY-MM-DD) for reliable sorting
+            const isoDate = new Date(session.createdAt).toISOString().split('T')[0];
+
+
+            session.questionAttempts.forEach((question) => {
+                if (question.userAnswer) {
+                    numberOfQuestionsAttempted += 1;
+                    attemptsByDate[isoDate] = (attemptsByDate[isoDate] || 0) + 1;
+                }
+
+                if (!question.isCorrect) {
+                    totalNumberOfIncorrectAnswers += 1;
+                }
+
+                if (question.isBookmarked) {
+                    numberOfBookmarkedQuestions += 1;
+                }
+
+                if (question.isFlagged) {
+                    numberOfFlaggedQuestions += 1;
+                }
+            })
+        });
+
+        const percentage = totalNumberOfQuestions == 0 ? 0 : (totalNumberOfCorrectAnswers / totalNumberOfQuestions) * 100;
+
+        // Area chart: sorted oldest → newest, display-formatted labels
+        const quizAttemptTrend = Object.entries(attemptsByDate)
+            .sort(([a], [b]) => a.localeCompare(b))
+            .map(([iso, count]) => ({
+                time: new Date(iso + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+                value: count,
+                date: iso,
+            }));
+
+        // Donut chart data
+        const questionBreakdown = [
+            { name: "Correct Answers", value: totalNumberOfCorrectAnswers },
+            { name: "Incorrect Answers", value: totalNumberOfIncorrectAnswers },
+            { name: "Bookmarked", value: numberOfBookmarkedQuestions },
+            { name: "Flagged", value: numberOfFlaggedQuestions },
+        ];
 
         const { password, ...user } = dbUser;
 
@@ -69,6 +104,9 @@ export async function loadDashboardInfo(userId: string, activeSession: Session):
                 questionsAttempted: numberOfQuestionsAttempted,
                 overallAccuracy: Math.round(percentage),
                 bookmarked: numberOfBookmarkedQuestions,
+                flagged: numberOfFlaggedQuestions,
+                quizAttemptTrend,
+                questionBreakdown,
             }
         }, {
             status: 200,
