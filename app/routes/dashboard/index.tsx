@@ -10,14 +10,22 @@ import {
   Calendar,
   Timer,
   GraduationCap,
-  Activity
+  Activity,
+  LayoutList,
+  CircleCheckBig,
+  CalendarDays,
+  Flag,
+  CheckCircle2,
+  Sparkles,
+  BookOpen,
+  ArrowRight,
+  History
 } from "lucide-react";
 import { Card, CardContent } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import NavBar from "~/components/navbar";
 import { destroySession, getSession } from "~/.server/sessions";
 import { loadDashboardInfo } from "./loader";
-import type { ApexOptions } from "apexcharts";
 import { lazy, Suspense, useEffect, useState } from "react";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { cn } from '~/utils';
@@ -63,8 +71,8 @@ export default function Dashboard({ loaderData }) {
   const questionsAttempted = data.questionsAttempted;
   const overallAccuracy = data.overallAccuracy;
   const bookmarked = data.bookmarked;
-
-
+  const quizAttemptTrend = data.quizAttemptTrend ?? [];
+  const questionBreakdown = data.questionBreakdown ?? [];
 
   return (
     <div>
@@ -81,348 +89,249 @@ export default function Dashboard({ loaderData }) {
         </div>
 
         {/* Quick Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Questions Attempted</p>
-                  <p className="text-2xl font-bold text-foreground" data-testid="stat-questions-attempted">
-                    {questionsAttempted}
-                  </p>
-                </div>
-                <div className="bg-primary/10 p-3 rounded-lg">
-                  <Brain className="text-primary w-6 h-6" />
-                </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+          <div className="rounded-2xl border border-border/50 bg-card px-5 py-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-blue-50 w-10 h-10 rounded-xl flex items-center justify-center">
+                <LayoutList className="text-blue-500 w-5 h-5" />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            <p className="text-sm text-muted-foreground mb-1">Questions</p>
+            <p className="text-2xl font-bold text-foreground tracking-tight" data-testid="stat-questions-attempted">
+              {questionsAttempted}
+            </p>
+          </div>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Overall Accuracy</p>
-                  <p className="text-2xl font-bold text-accent" data-testid="stat-accuracy">
-                    {overallAccuracy}%
-                  </p>
-                </div>
-                <div className="bg-accent/10 p-3 rounded-lg">
-                  <Target className="text-accent w-6 h-6" />
-                </div>
+          <div className="rounded-2xl border border-border/50 bg-card px-5 py-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-emerald-50 w-10 h-10 rounded-xl flex items-center justify-center">
+                <CircleCheckBig className="text-emerald-500 w-5 h-5" />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            <p className="text-sm text-muted-foreground mb-1">Accuracy</p>
+            <p className="text-2xl font-bold text-foreground tracking-tight text-emerald-500" data-testid="stat-accuracy">
+              {overallAccuracy}%
+            </p>
+          </div>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Sessions</p>
-                  <p className="text-2xl font-bold text-chart-3" data-testid="stat-sessions">
-                    {sessions}
-                    {/* {statsLoading ? '-' : stats?.sessionCount || 0} */}
-                  </p>
-                </div>
-                <div className="bg-chart-3/10 p-3 rounded-lg">
-                  <Calendar className="text-chart-3 w-6 h-6" />
-                </div>
+          <div className="rounded-2xl border border-border/50 bg-card px-5 py-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-amber-50 w-10 h-10 rounded-xl flex items-center justify-center">
+                <CalendarDays className="text-amber-500 w-5 h-5" />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            <p className="text-sm text-muted-foreground mb-1">Sessions</p>
+            <p className="text-2xl font-bold text-foreground tracking-tight text-amber-500" data-testid="stat-sessions">
+              {sessions}
+            </p>
+          </div>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-muted-foreground">Bookmarked</p>
-                  <p className="text-2xl font-bold text-chart-4" data-testid="stat-bookmarked">
-                    {/* {statsLoading ? '-' : stats?.bookmarkCount || 0} */}
-                    {bookmarked}
-                  </p>
-                </div>
-                <div className="bg-chart-4/10 p-3 rounded-lg">
-                  <BookmarkIcon className="text-chart-4 w-6 h-6" />
-                </div>
+          <div className="rounded-2xl border border-border/50 bg-card px-5 py-5">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-rose-50 w-10 h-10 rounded-xl flex items-center justify-center">
+                <Flag className="text-rose-500 w-5 h-5" />
               </div>
-            </CardContent>
-          </Card>
+            </div>
+            <p className="text-sm text-muted-foreground mb-1">Bookmarked</p>
+            <p className="text-2xl font-bold text-foreground tracking-tight text-rose-500" data-testid="stat-bookmarked">
+              {bookmarked}
+            </p>
+          </div>
         </div>
 
         {/* Study Modes */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
           {/* Practice Mode */}
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardContent className="p-8">
-              <div className="flex flex-col md:flex-row md:items-center gap-3 mb-6">
-                <div className="bg-primary/10 w-16 h-16 rounded-xl flex items-center justify-center mr-4">
-                  <Brain className="text-primary w-8 h-8" />
+          <div className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5">
+            <div className="p-8">
+              <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+                <div className="bg-gradient-to-br from-blue-500 to-indigo-600 w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                  <Sparkles className="text-white w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-semibold text-foreground">Practice Mode</h3>
-                  <p className="text-muted-foreground">Learn with immediate feedback</p>
+                  <h3 className="text-xl font-bold text-foreground">Practice Mode</h3>
+                  <p className="text-sm text-muted-foreground">Learn with immediate feedback</p>
                 </div>
               </div>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-muted-foreground mb-6 leading-relaxed">
                 Interactive learning sessions with instant feedback and detailed explanations.
                 Perfect for reinforcing knowledge and identifying weak areas.
               </p>
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+              <div className="space-y-3 mb-8">
+                <div className="flex items-center gap-3 text-sm text-foreground/80">
+                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-500/10 flex items-center justify-center">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
+                  </div>
                   <span>Immediate answer feedback</span>
                 </div>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                <div className="flex items-center gap-3 text-sm text-foreground/80">
+                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-500/10 flex items-center justify-center">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
+                  </div>
                   <span>Detailed explanations</span>
                 </div>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-2 h-2 bg-primary rounded-full mr-3"></div>
+                <div className="flex items-center gap-3 text-sm text-foreground/80">
+                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-blue-500/10 flex items-center justify-center">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-500" />
+                  </div>
                   <span>Adaptive question selection</span>
                 </div>
               </div>
               <Link to="/practice-mode-start">
-                <Button className="w-full" data-testid="button-start-practice">
+                <Button className="w-full h-12 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-semibold shadow-lg shadow-blue-500/25 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/30" data-testid="button-start-practice">
+                  <Sparkles className="w-4 h-4 mr-2" />
                   Start Practice Session
                 </Button>
               </Link>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
 
           {/* Exam Mode */}
-          <Card className="hover:shadow-lg transition-shadow">
-            <CardContent className="p-8 flex flex-col h-full">
-              <div className="flex flex-col md:flex-row md:items-center gap-3 mb-6">
-                <div className="bg-accent/10 w-16 h-16 rounded-xl flex items-center justify-center mr-4">
-                  <Clock className="text-accent w-8 h-8" />
+          <div className="group relative overflow-hidden rounded-2xl border border-border/60 bg-card shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5">
+            <div className="p-8 flex flex-col h-full">
+              <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
+                <div className="bg-gradient-to-br from-emerald-500 to-teal-600 w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/25 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                  <Timer className="text-white w-7 h-7" />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-semibold text-foreground">Exam Simulation</h3>
-                  <p className="text-muted-foreground">Full timed examination</p>
+                  <h3 className="text-xl font-bold text-foreground">Exam Simulation</h3>
+                  <p className="text-sm text-muted-foreground">Full timed examination</p>
                 </div>
               </div>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-muted-foreground mb-6 leading-relaxed">
                 Complete 3.5-hour examination simulation with 150 questions.
                 Experience real AMC conditions with comprehensive score analysis.
               </p>
-              <div className="space-y-3 mb-6">
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-2 h-2 bg-accent rounded-full mr-3"></div>
+              <div className="space-y-3 mb-8">
+                <div className="flex items-center gap-3 text-sm text-foreground/80">
+                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                  </div>
                   <span>150 questions, 3.5 hours</span>
                 </div>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-2 h-2 bg-accent rounded-full mr-3"></div>
+                <div className="flex items-center gap-3 text-sm text-foreground/80">
+                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                  </div>
                   <span>Real exam conditions</span>
                 </div>
-                <div className="flex items-center text-sm text-muted-foreground">
-                  <div className="w-2 h-2 bg-accent rounded-full mr-3"></div>
+                <div className="flex items-center gap-3 text-sm text-foreground/80">
+                  <div className="flex-shrink-0 w-5 h-5 rounded-full bg-emerald-500/10 flex items-center justify-center">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                  </div>
                   <span>Comprehensive analysis</span>
                 </div>
               </div>
               <Link to="/exam-mode-start" className="mt-auto">
-                <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90" data-testid="button-start-exam">
+                <Button className="w-full h-12 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-semibold shadow-lg shadow-emerald-500/25 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-500/30" data-testid="button-start-exam">
+                  <Timer className="w-4 h-4 mr-2" />
                   Start Exam Simulation
                 </Button>
               </Link>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </div>
 
         {/* Analytical Charts */}
-        <QuizAnalytics />
+        <QuizAnalytics
+          quizAttemptTrend={quizAttemptTrend}
+          questionBreakdown={questionBreakdown}
+        />
 
         {/* Additional Features */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
           {/* Subject Practice */}
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="bg-chart-3/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <Stethoscope className="text-chart-3 w-6 h-6" />
+          <Link to="/subjects" className="group">
+            <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 h-full">
+              <div className="bg-gradient-to-br from-amber-500 to-orange-500 w-12 h-12 rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-amber-500/20 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                <BookOpen className="text-white w-5.5 h-5.5" />
               </div>
-              <h4 className="text-lg font-semibold text-foreground mb-2">Subject Practice</h4>
-              <p className="text-muted-foreground mb-4">Focus on specific medical specialties</p>
-              <Link to="/subjects">
-                <Button variant="link" className="text-primary hover:underline font-medium p-0" data-testid="button-browse-subjects">
-                  Browse Subjects →
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+              <h4 className="text-lg font-bold text-foreground mb-1.5">Subject Practice</h4>
+              <p className="text-sm text-muted-foreground mb-5 leading-relaxed">Focus on specific medical specialties</p>
+              <div className="flex items-center gap-2 text-sm font-semibold text-blue-500 group-hover:text-blue-600 transition-colors" data-testid="button-browse-subjects">
+                Browse Subjects
+                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </div>
+            </div>
+          </Link>
 
           {/* Review Sessions */}
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="bg-chart-4/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <RotateCcw className="text-chart-4 w-6 h-6" />
+          <Link to="/progress" className="group">
+            <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 h-full">
+              <div className="bg-gradient-to-br from-violet-500 to-purple-600 w-12 h-12 rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-violet-500/20 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                <History className="text-white w-5.5 h-5.5" />
               </div>
-              <h4 className="text-lg font-semibold text-foreground mb-2">Review & Redo</h4>
-              <p className="text-muted-foreground mb-4">Revisit previous sessions and mistakes</p>
-              <Link to="/progress">
-                <Button variant="link" className="text-primary hover:underline font-medium p-0" data-testid="button-view-sessions">
-                  View Sessions →
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+              <h4 className="text-lg font-bold text-foreground mb-1.5">Review & Redo</h4>
+              <p className="text-sm text-muted-foreground mb-5 leading-relaxed">Revisit previous sessions and mistakes</p>
+              <div className="flex items-center gap-2 text-sm font-semibold text-blue-500 group-hover:text-blue-600 transition-colors" data-testid="button-view-sessions">
+                View Sessions
+                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </div>
+            </div>
+          </Link>
 
           {/* Bookmarked Questions */}
-          <Card className="hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              <div className="bg-chart-5/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <BookmarkIcon className="text-chart-5 w-6 h-6" />
+          <Link to="/bookmarks" className="group">
+            <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-card p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 h-full">
+              <div className="bg-gradient-to-br from-rose-500 to-pink-600 w-12 h-12 rounded-2xl flex items-center justify-center mb-5 shadow-lg shadow-rose-500/20 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3">
+                <Flag className="text-white w-5.5 h-5.5" />
               </div>
-              <h4 className="text-lg font-semibold text-foreground mb-2">Flagged Questions</h4>
-              <p className="text-muted-foreground mb-4">Practice your saved difficult questions</p>
-              <Link to="/bookmarks">
-                <Button variant="link" className="text-primary hover:underline font-medium p-0" data-testid="button-view-bookmarks">
-                  View Bookmarks →
-                </Button>
-              </Link>
-            </CardContent>
-          </Card>
+              <h4 className="text-lg font-bold text-foreground mb-1.5">Flagged Questions</h4>
+              <p className="text-sm text-muted-foreground mb-5 leading-relaxed">Practice your saved difficult questions</p>
+              <div className="flex items-center gap-2 text-sm font-semibold text-blue-500 group-hover:text-blue-600 transition-colors" data-testid="button-view-bookmarks">
+                View Bookmarks
+                <ArrowRight className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </div>
+            </div>
+          </Link>
         </div>
-
-        {/* Recent Sessions */}
-        {/* {recentSessions && recentSessions.length > 0 && (
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex justify-between items-center mb-6">
-              <h3 className="text-xl font-semibold text-foreground">Recent Study Sessions</h3>
-              <Link href="/progress">
-                <Button variant="link" className="text-primary hover:underline text-sm" data-testid="button-view-all-sessions">
-                  View All Sessions →
-                </Button>
-              </Link>
-            </div>
-            
-            <div className="space-y-4">
-              {recentSessions.map((session: any, index: number) => (
-                <div 
-                  key={session._id} 
-                  className="flex items-center justify-between p-4 bg-background rounded-lg"
-                  data-testid={`recent-session-${index}`}
-                >
-                  <div className="flex items-center space-x-4">
-                    <div className="bg-primary/10 w-10 h-10 rounded-lg flex items-center justify-center">
-                      {session.type === 'practice' ? (
-                        <Brain className="text-primary w-5 h-5" />
-                      ) : session.type === 'exam' ? (
-                        <Clock className="text-accent w-5 h-5" />
-                      ) : (
-                        <Stethoscope className="text-chart-3 w-5 h-5" />
-                      )}
-                    </div>
-                    <div>
-                      <h4 className="font-medium text-foreground">
-                        {session.type === 'practice' ? 'Practice Session' : 
-                         session.type === 'exam' ? 'Exam Simulation' : 'Subject Practice'}
-                      </h4>
-                      <p className="text-sm text-muted-foreground">
-                        {session.subject || 'Mixed Topics'} • {session.totalQuestions} questions
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-4">
-                    {session.score && (
-                      <div className="text-center">
-                        <div className="text-sm font-semibold text-accent">{session.score}%</div>
-                        <div className="text-xs text-muted-foreground">Score</div>
-                      </div>
-                    )}
-                    <Button variant="link" className="text-primary hover:underline text-sm" data-testid={`button-review-session-${index}`}>
-                      Review
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )} */}
       </div>
     </div>
   );
 }
 
+interface QuizAnalyticsProps {
+  quizAttemptTrend: { time: string; value: number; date: string }[];
+  questionBreakdown: { name: string; value: number }[];
+}
 
-const QuizAnalytics: React.FC = () => {
+const QuizAnalytics: React.FC<QuizAnalyticsProps> = ({ quizAttemptTrend, questionBreakdown }) => {
 
-  const [timeRange, setTimeRange] = useState('24h');
+  const [timeRange, setTimeRange] = useState('All');
 
-  // Active Tunnels data
-  const tunnelData = [
-    { time: '2 pm', value: 14 },
-    { time: '3 pm', value: 12 },
-    { time: '4 pm', value: 16 },
-    { time: '5 pm', value: 11 },
-    { time: '6 pm', value: 18 },
-    { time: '7 pm', value: 22 },
-    { time: '8 pm', value: 24 },
-    { time: '9 pm', value: 21 },
-    { time: '10 pm', value: 28 },
-    { time: '11 pm', value: 32 },
-    { time: '12 am', value: 18 },
-    { time: '1 am', value: 14 },
-    { time: '2 am', value: 9 },
-    { time: '3 am', value: 12 },
-    { time: '4 am', value: 8 },
-    { time: '5 am', value: 11 },
-    { time: '6 am', value: 14 },
-    { time: '7 am', value: 16 },
-    { time: '8 am', value: 19 },
-    { time: '9 am', value: 15 },
-    { time: '10 am', value: 18 },
-    { time: '11 am', value: 22 },
-    { time: '12 pm', value: 26 },
-    { time: '1 pm', value: 24 }
-  ];
-
-  // Plan Distribution data
-  const planData = [
-    { name: 'Free', value: 516, color: '#6B7280' },
-    { name: 'Ray', value: 0, color: '#3B82F6' },
-    { name: 'Beam', value: 1, color: '#8B5CF6' },
-    { name: 'Pulse', value: 0, color: '#F97316' }
-  ];
-
-  const ranges = ['24h', '7d', '30d'];
+  const ranges = ['7d', '30d', '90d', 'All'];
 
   const activeIndex = ranges.indexOf(timeRange);
 
-  const attemptData = [
-    { name: "Correct Answers", value: 312 },
-    { name: "Incorrect Answers", value: 128 },
-    { name: "Bookmarked", value: 56 },
-    { name: "Flagged", value: 22 }
-  ];
+  // Filter trend data by selected time range using the ISO date field
+  const daysMap: Record<string, number> = { '7d': 7, '30d': 30, '90d': 90 };
+  const chartData = timeRange === 'All'
+    ? quizAttemptTrend
+    : (() => {
+      const cutoff = new Date(Date.now() - daysMap[timeRange] * 86400000);
+      const filtered = quizAttemptTrend.filter(item => new Date(item.date) >= cutoff);
+      return filtered.length > 0 ? filtered : quizAttemptTrend;
+    })();
+
+  // Plan Distribution data
+  // const planData = [
+  //   { name: 'Free', value: 516, color: '#6B7280' },
+  //   { name: 'Ray', value: 0, color: '#3B82F6' },
+  //   { name: 'Beam', value: 1, color: '#8B5CF6' },
+  //   { name: 'Pulse', value: 0, color: '#F97316' }
+  // ];
 
   const PRIMARY = "hsl(221.2, 83.2%, 53.3%)";
 
-  const COLORS = ["#9ca3af", PRIMARY, "#a855f7", "#f59e0b"];
+  // const COLORS = ["#9ca3af", PRIMARY, "#a855f7", "#f59e0b"];
+  const COLORS = ["#22c55e", "#ef4444", "#a855f7", "#f59e0b"];
 
   return (
     // <Suspense fallback={<div className="mb-8 h-[400px]">Loading chart...</div>}>
-    //   <div className="grid lg:grid-cols-2 gap-8 space-y-10 mb-2">
-    //     <div className="rounded-lg border border-[#e2e8f0] h-full max-h-[400px] pt-5 bg-card text-card-foreground">
-    //       <Chart
-    //         options={areaChartOptions}
-    //         series={areaChartSeries}
-    //         type="area"
-    //         className="h-full"
-    //       />
-    //     </div>
-    //     <div className="rounded-lg border h-full max-h-[400px] border-[#e2e8f0] pt-5 bg-card text-card-foreground">
-    //       <Chart
-    //         options={barChartOptions}
-    //         series={barChartSeries}
-    //         type="bar"
-    //         className="h-full"
-    //       />
-    //     </div>
-    //   </div>
+    //   
     // </Suspense>
-    <div className="grid lg:grid-cols-3 gap-8 mb-8">
-      {/* Active Tunnels Chart */}
+    <div className="grid lg:grid-cols-3 gap-8 mb-8 overflow-x-hidden">
+      {/* Active Chart */}
       <div className="lg:col-span-2 bg-white border border-zinc-200 rounded-xl py-6">
         <div className="flex items-center justify-between mb-6 px-6">
           <div>
@@ -456,7 +365,7 @@ const QuizAnalytics: React.FC = () => {
         </div>
 
         <ResponsiveContainer width="100%" height={400} className="pr-5">
-          <AreaChart data={tunnelData}>
+          <AreaChart data={chartData}>
             <defs>
               <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#2563eb" stopOpacity={0.3} />
@@ -466,11 +375,11 @@ const QuizAnalytics: React.FC = () => {
             <XAxis
               dataKey="time"
               stroke="#52525b"
-              tick={{ fill: '#71717a' }}
+              tick={{ fill: '#71717a', fontSize: 11 }}
             />
             <YAxis
               stroke="#52525b"
-              tick={{ fill: '#71717a' }}
+              tick={{ fill: '#71717a', fontSize: 11 }}
             />
             <Tooltip
               contentStyle={{
@@ -496,7 +405,7 @@ const QuizAnalytics: React.FC = () => {
         <div className="h-72 flex items-center justify-center">
           <PieChart width={220} height={220}>
             <Pie
-              data={attemptData}
+              data={questionBreakdown}
               innerRadius={70}
               outerRadius={100}
               paddingAngle={2}
@@ -504,7 +413,7 @@ const QuizAnalytics: React.FC = () => {
               stroke="#e5e7eb"
               strokeWidth={1}
             >
-              {attemptData.map((entry, i) => (
+              {questionBreakdown.map((entry, i) => (
                 <Cell
                   key={i}
                   fill={COLORS[i]}
@@ -523,7 +432,7 @@ const QuizAnalytics: React.FC = () => {
           </PieChart>
         </div>
         <ul className="space-y-2 text-sm">
-          {attemptData.map((p, i) => (
+          {questionBreakdown.map((p, i) => (
             <li key={p.name} className="flex justify-between text-zinc-600">
               <span className="flex items-center gap-2">
                 <span className="h-2 w-2 rounded-full" style={{ background: COLORS[i] }} />
